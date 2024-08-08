@@ -24,3 +24,6 @@ spring:
     password: ${DB_PASSWORD:aaron}
     schemas: core
     locations: classpath:db/migration
+
+sms:
+  default-title: BWONGO-SMS

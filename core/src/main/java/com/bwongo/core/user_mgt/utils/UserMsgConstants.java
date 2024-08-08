@@ -25,7 +25,7 @@ public class UserMsgConstants {
     public static final String IDENTIFICATION_TYPE_REQUIRED = "First name is required";
     public static final String IDENTIFICATION_NUMBER_REQUIRED = "Identification number is required";
     public static final String FIRST_NAME_REQUIRED = "First name is required";
-    public static final String LAST_NAME_REQUIRED = "Last name is required";
+    public static final String SECOND_NAME_REQUIRED = "Second name is required";
     public static final String LAST_NAME_ONLY_CHARACTERS = "Last name should contain only characters";
     public static final String FIRST_NAME_ONLY_CHARACTERS = "First name should contain only characters";
     public static final String INVALID_PHONE_NUMBER = "Invalid phone number";

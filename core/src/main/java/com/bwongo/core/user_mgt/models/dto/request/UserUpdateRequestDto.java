@@ -14,15 +14,21 @@ import static com.bwongo.core.user_mgt.utils.UserMsgConstants.*;
  * @LocalTime 3:55 PM
  **/
 public record UserUpdateRequestDto(
-        String username,
+        Long userId,
+        String firstName,
+        String secondName,
+        String email,
         Long userGroupId,
         String userType
 ) {
     public void validate(){
-        Validate.notEmpty(username, USERNAME_REQUIRED);
+        Validate.notNull(userId, ExceptionType.BAD_REQUEST, USER_ID_REQUIRED);
+        Validate.notEmpty(firstName, FIRST_NAME_REQUIRED);
+        Validate.notEmpty(secondName, SECOND_NAME_REQUIRED);
+        Validate.notEmpty(email, EMAIL_REQUIRED);
         Validate.notNull(userGroupId, ExceptionType.BAD_REQUEST, USER_GROUP_ID_REQUIRED);
         Validate.notNull(userType, ExceptionType.BAD_REQUEST, USER_TYPE_REQUIRED);
         Validate.isTrue(isUserType(userType), ExceptionType.BAD_REQUEST, VALID_USER_TYPE);
-        StringRegExUtil.stringOfOnlyNumbersAndChars(username, USERNAME_SHOULD_CONTAIN_ONLY_CHARS_AND_NUMBERS);
+        StringRegExUtil.stringOfEmail(email, INVALID_EMAIL);
     }
 }

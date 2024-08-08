@@ -51,7 +51,7 @@ public class AuthenticationService {
         var user = userRepository.findByUsername(authenticationRequestDto.getEmail()).orElseThrow(
                 () -> new UsernameNotFoundException("User not found")
         );
-        var username = user.getUsername();
+        var username = user.getEmail();
         var authorities = securityUserService.getSecurityUserDetails(username).getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
@@ -71,13 +71,13 @@ public class AuthenticationService {
                 .map(refreshTokenService::verifyExpiration)
                 .map(TRefreshToken::getUser)
                 .map(user -> {
-                    var accessToken = jwtService.generateToken(getMappedSecurityUserDetails(user.getUsername()));
-                    var authorities = securityUserService.getSecurityUserDetails(user.getUsername()).getAuthorities().stream()
+                    var accessToken = jwtService.generateToken(getMappedSecurityUserDetails(user.getEmail()));
+                    var authorities = securityUserService.getSecurityUserDetails(user.getEmail()).getAuthorities().stream()
                             .map(GrantedAuthority::getAuthority)
                             .toList();
                     return AuthenticationResponseDto.builder()
                             .accessToken(accessToken)
-                            .refreshToken(refreshTokenService.createRefreshToken(user.getUsername()).getToken())
+                            .refreshToken(refreshTokenService.createRefreshToken(user.getEmail()).getToken())
                             .id(user.getId())
                             .userGroup(userDtoService.mapTUserGroupToUserGroupResponseDto(user.getUserGroup()))
                             .authorities(authorities)

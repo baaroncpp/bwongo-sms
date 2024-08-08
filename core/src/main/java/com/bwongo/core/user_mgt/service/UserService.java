@@ -58,8 +58,8 @@ public class UserService {
         Validate.notEmpty(userRequestDto.password(), PASSWORD_REQUIRED);
         StringRegExUtil.stringOfStandardPassword(userRequestDto.password(), STANDARD_PASSWORD);
 
-        var existingUserUsername = userRepository.findByUsername(userRequestDto.username());
-        Validate.isTrue(existingUserUsername.isEmpty(), ExceptionType.BAD_REQUEST,USERNAME_TAKEN, userRequestDto.username());
+        var existingUserUsername = userRepository.findByEmail(userRequestDto.email());
+        Validate.isTrue(existingUserUsername.isEmpty(), ExceptionType.BAD_REQUEST,USERNAME_TAKEN, userRequestDto.email());
 
         var existingUserGroup = userGroupRepository.findById(userRequestDto.userGroupId());
         Validate.isPresent(existingUserGroup, USER_GROUP_DOES_NOT_EXIST, userRequestDto.userGroupId());
@@ -93,23 +93,23 @@ public class UserService {
     public UserResponseDto updateUser(Long userId, UserUpdateRequestDto userUpdateRequestDto) {
 
         userUpdateRequestDto.validate();
-        var username = userUpdateRequestDto.username();
+        var email = userUpdateRequestDto.email();
         var userType = UserTypeEnum.valueOf(userUpdateRequestDto.userType());
-        var existingUserUsername = userRepository.findByUsername(userUpdateRequestDto.username());
+        var existingUserEmail = userRepository.findByEmail(userUpdateRequestDto.email());
 
         var existingUser = userRepository.findById(userId);
         Validate.isPresent(existingUser, String.format(USER_DOES_NOT_EXIST, userId));
         var user = existingUser.get();
 
-        if(!user.getUsername().equals(username))
-            Validate.isTrue(existingUserUsername.isEmpty(), ExceptionType.BAD_REQUEST,USERNAME_TAKEN, userUpdateRequestDto.username());
+        if(!user.getEmail().equals(email))
+            Validate.isTrue(existingUserEmail.isEmpty(), ExceptionType.BAD_REQUEST, EMAIL_ALREADY_TAKEN, email);
 
         var existingUserGroup = userGroupRepository.findById(userUpdateRequestDto.userGroupId());
         Validate.isPresent(existingUserGroup, USER_GROUP_DOES_NOT_EXIST, userUpdateRequestDto.userGroupId());
         final var userGroup = existingUserGroup.get();
 
         user.setUserGroup(userGroup);
-        user.setUsername(username);
+        user.setEmail(email);
         user.setUserType(userType);
 
         return userDtoService.userToDto(userRepository.save(user));

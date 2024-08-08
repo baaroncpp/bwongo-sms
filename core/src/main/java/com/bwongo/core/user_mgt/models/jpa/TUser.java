@@ -2,6 +2,7 @@ package com.bwongo.core.user_mgt.models.jpa;
 
 import com.bwongo.core.base.model.enums.UserTypeEnum;
 import com.bwongo.core.base.model.jpa.BaseEntity;
+import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
 import jakarta.persistence.*;
 import lombok.Setter;
 
@@ -16,7 +17,9 @@ import lombok.Setter;
 @Table(name = "t_user", schema = "core")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class TUser extends BaseEntity {
-    private String username;
+    private String firstName;
+    private String secondName;
+    private String email;
     private String password;
     private boolean accountLocked;
     private boolean accountExpired;
@@ -27,10 +30,23 @@ public class TUser extends BaseEntity {
     private boolean isDeleted;
     private Long approvedBy;
     private UserTypeEnum userType;
+    private Boolean nonVerifiedEmail;
+    private String imagePath;
+    private TMerchant merchant;
 
-    @Column(name = "username")
-    public String getUsername() {
-        return this.username;
+    @Column(name = "first_name")
+    public String getFirstName() {
+        return firstName;
+    }
+
+    @Column(name = "second_name")
+    public String getSecondName() {
+        return secondName;
+    }
+
+    @Column(name = "email")
+    public String getEmail() {
+        return this.email;
     }
 
     @Column(name = "password")
@@ -82,4 +98,19 @@ public class TUser extends BaseEntity {
         return userType;
     }
 
+    @Column(name = "non_verified_email")
+    public Boolean getNonVerifiedEmail() {
+        return nonVerifiedEmail;
+    }
+
+    @Column(name = "image_path")
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    @JoinColumn(name = "merchant_id", referencedColumnName = "id")
+    @OneToOne(fetch = FetchType.EAGER)
+    public TMerchant getMerchant() {
+        return merchant;
+    }
 }

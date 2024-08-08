@@ -1,6 +1,7 @@
 package com.bwongo.core.user_mgt.models.dto.response;
 
 import com.bwongo.core.base.model.enums.UserTypeEnum;
+import com.bwongo.core.merchant_mgt.models.dto.response.MerchantResponseDto;
 
 import java.util.Date;
 
@@ -14,7 +15,9 @@ public record UserResponseDto(
         Long id,
         Date createdOn,
         Date modifiedOn,
-        String username,
+        String firstName,
+        String secondName,
+        String email,
         boolean accountLocked,
         boolean accountExpired,
         boolean credentialExpired,
@@ -22,6 +25,9 @@ public record UserResponseDto(
         UserGroupResponseDto userGroup,
         Boolean isDeleted,
         Long approvedBy,
-        UserTypeEnum userType
+        UserTypeEnum userType,
+        Boolean nonVerifiedEmail,
+        String imagePath,
+        Long merchantId
 ) {
 }

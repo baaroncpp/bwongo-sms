@@ -36,7 +36,7 @@ public class SecurityUserService {
         );
 
         List<TGroupAuthority> groupAuthorities = groupAuthorityRepository.findByUserGroup(user.getUserGroup());
-        Validate.notNull(groupAuthorities, ExceptionType.INSUFFICIENT_AUTH, "user %s has no permissions, to any services", user.getUsername());
+        Validate.notNull(groupAuthorities, ExceptionType.INSUFFICIENT_AUTH, "user %s has no permissions, to any services", user.getEmail());
 
         Set<SimpleGrantedAuthority> permissions = groupAuthorities
                 .stream()
@@ -47,7 +47,7 @@ public class SecurityUserService {
 
         return SecurityUserDetails.builder()
                 .id(user.getId())
-                .username(user.getUsername())
+                .username(user.getEmail())
                 .enabled(user.isApproved())
                 .accountNonExpired(!user.isAccountExpired())
                 .accountNonLocked(!user.isAccountLocked())

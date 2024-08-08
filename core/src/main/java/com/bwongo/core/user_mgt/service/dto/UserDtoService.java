@@ -133,7 +133,7 @@ public class UserDtoService {
         userGroup.setId(userRequestDto.userGroupId());
 
         var user = new TUser();
-        user.setUsername(userRequestDto.username());
+        user.setEmail(userRequestDto.email());
         user.setPassword(userRequestDto.password());
         user.setUserGroup(userGroup);
 
@@ -150,7 +150,9 @@ public class UserDtoService {
                 user.getId(),
                 user.getCreatedOn(),
                 user.getModifiedOn(),
-                user.getUsername(),
+                user.getFirstName(),
+                user.getSecondName(),
+                user.getEmail(),
                 user.isAccountLocked(),
                 user.isAccountExpired(),
                 user.isCredentialExpired(),
@@ -158,7 +160,10 @@ public class UserDtoService {
                 userGroupToDto(user.getUserGroup()),
                 user.getDeleted(),
                 user.getApprovedBy(),
-                user.getUserType()
+                user.getUserType(),
+                user.getNonVerifiedEmail(),
+                user.getImagePath(),
+                user.getMerchant().getId()
         );
     }
 
