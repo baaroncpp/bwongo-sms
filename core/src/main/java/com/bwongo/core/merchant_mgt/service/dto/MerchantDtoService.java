@@ -3,11 +3,14 @@ package com.bwongo.core.merchant_mgt.service.dto;
 import com.bwongo.core.base.model.enums.MerchantTypeEnum;
 import com.bwongo.core.base.service.dto.BaseDtoService;
 import com.bwongo.core.merchant_mgt.models.dto.request.MerchantRequestDto;
-import com.bwongo.core.merchant_mgt.models.dto.request.MerchantSmsConfigurationRequestDto;
+import com.bwongo.core.merchant_mgt.models.dto.request.MerchantSmsSettingRequestDto;
+import com.bwongo.core.merchant_mgt.models.dto.request.MerchantUpdateRequestDto;
+import com.bwongo.core.merchant_mgt.models.dto.response.MerchantApiSettingResponseDto;
 import com.bwongo.core.merchant_mgt.models.dto.response.MerchantResponseDto;
-import com.bwongo.core.merchant_mgt.models.dto.response.MerchantSmsConfigurationResponseDto;
+import com.bwongo.core.merchant_mgt.models.dto.response.MerchantSmsSettingResponseDto;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
-import com.bwongo.core.merchant_mgt.models.jpa.TMerchantSmsConfiguration;
+import com.bwongo.core.merchant_mgt.models.jpa.TMerchantApiSetting;
+import com.bwongo.core.merchant_mgt.models.jpa.TMerchantSmsSetting;
 import com.bwongo.core.user_mgt.models.jpa.TUser;
 import com.bwongo.core.user_mgt.service.dto.UserDtoService;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +47,20 @@ public class MerchantDtoService {
                 .build();
     }
 
+    public TMerchant updateDtoToMerchant(MerchantUpdateRequestDto merchantUpdateRequestDto) {
+
+        if (merchantUpdateRequestDto == null)
+            return null;
+
+        return TMerchant.builder()
+                .email(merchantUpdateRequestDto.email())
+                .phoneNumber(merchantUpdateRequestDto.phoneNumber())
+                .merchantName(merchantUpdateRequestDto.merchantName())
+                .merchantType(MerchantTypeEnum.valueOf(merchantUpdateRequestDto.merchantType()))
+                .location(merchantUpdateRequestDto.location())
+                .build();
+    }
+
     public MerchantResponseDto merchantToDto(TMerchant merchant) {
 
         if (merchant == null)
@@ -67,40 +84,36 @@ public class MerchantDtoService {
         );
     }
 
-    public TMerchantSmsConfiguration dtoToMerchantSmsConfiguration(MerchantSmsConfigurationRequestDto merchantSmsConfigurationRequestDto) {
+    public TMerchantSmsSetting dtoToMerchantSmsSetting(MerchantSmsSettingRequestDto merchantSmsSettingRequestDto) {
 
-        if(merchantSmsConfigurationRequestDto == null)
+        if(merchantSmsSettingRequestDto == null)
             return null;
 
-        var customizedTitle = merchantSmsConfigurationRequestDto.isCustomized() ? merchantSmsConfigurationRequestDto.customizedTitle() : defaultTitle;
+        var customizedTitle = merchantSmsSettingRequestDto.isCustomized() ? merchantSmsSettingRequestDto.customizedTitle() : defaultTitle;
 
-        return TMerchantSmsConfiguration.builder()
-                .smsCost(merchantSmsConfigurationRequestDto.smsCost())
-                .isCustomized(merchantSmsConfigurationRequestDto.isCustomized())
+        return TMerchantSmsSetting.builder()
+                .smsCost(merchantSmsSettingRequestDto.smsCost())
+                .isCustomized(merchantSmsSettingRequestDto.isCustomized())
                 .customizedTitle(customizedTitle)
                 .build();
     }
 
-    public MerchantSmsConfigurationResponseDto merchantSmsConfigurationToDto(TMerchantSmsConfiguration merchantSmsConfiguration){
+    public MerchantSmsSettingResponseDto merchantSmsSettingToDto(TMerchantSmsSetting merchantSmsSetting){
 
-        if (merchantSmsConfiguration == null)
+        if (merchantSmsSetting == null)
             return null;
 
-        return new MerchantSmsConfigurationResponseDto(
-                merchantSmsConfiguration.getId(),
-                merchantSmsConfiguration.getCreatedOn(),
-                merchantSmsConfiguration.getModifiedOn(),
-                userDtoService.userToDto(merchantSmsConfiguration.getCreatedBy()),
-                userDtoService.userToDto(merchantSmsConfiguration.getModifiedBy()),
-                merchantSmsConfiguration.getCustomizedTitle(),
-                merchantToDto(merchantSmsConfiguration.getMerchant()),
-                merchantSmsConfiguration.getSmsCost(),
-                merchantSmsConfiguration.getMaxNumberOfCharactersPerSms(),
-                merchantSmsConfiguration.isCustomized(),
-                merchantSmsConfiguration.getApiKey(),
-                merchantSmsConfiguration.getApiSecret(),
-                merchantSmsConfiguration.isKeyIssued(),
-                merchantSmsConfiguration.getKeyExpiryDate()
+        return new MerchantSmsSettingResponseDto(
+                merchantSmsSetting.getId(),
+                merchantSmsSetting.getCreatedOn(),
+                merchantSmsSetting.getModifiedOn(),
+                userDtoService.userToDto(merchantSmsSetting.getCreatedBy()),
+                userDtoService.userToDto(merchantSmsSetting.getModifiedBy()),
+                merchantSmsSetting.getCustomizedTitle(),
+                merchantToDto(merchantSmsSetting.getMerchant()),
+                merchantSmsSetting.getSmsCost(),
+                merchantSmsSetting.getMaxNumberOfCharactersPerSms(),
+                merchantSmsSetting.isCustomized()
         );
     }
 
@@ -110,5 +123,24 @@ public class MerchantDtoService {
             return null;
 
         return userDtoService.dtoToTUser(merchantRequestDto.merchantUser());
+    }
+
+    public MerchantApiSettingResponseDto merchantApiSettingToDto(TMerchantApiSetting merchantApiSetting){
+
+        if(merchantApiSetting == null)
+            return null;
+
+        return new MerchantApiSettingResponseDto(
+                merchantApiSetting.getId(),
+                merchantApiSetting.getCreatedOn(),
+                merchantApiSetting.getModifiedOn(),
+                userDtoService.userToDto(merchantApiSetting.getCreatedBy()),
+                userDtoService.userToDto(merchantApiSetting.getModifiedBy()),
+                merchantToDto(merchantApiSetting.getMerchant()),
+                merchantApiSetting.getApiKey(),
+                merchantApiSetting.getApiSecret(),
+                merchantApiSetting.isKeyIssued(),
+                merchantApiSetting.getKeyExpiryDate()
+        );
     }
 }

@@ -27,3 +27,6 @@ spring:
 
 sms:
   default-title: BWONGO-SMS
+
+api:
+  encryption-password: 12345

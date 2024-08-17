@@ -29,7 +29,7 @@ public class RefreshTokenService {
     public TRefreshToken createRefreshToken(String username){
         var date = DateTimeUtil.getCurrentUTCTime();
         var refreshToken = TRefreshToken.builder()
-                .user(userRepository.findByUsername(username).get())
+                .user(userRepository.findByEmail(username).get())
                 .token(randomString())
                 .expiryDate(Instant.now().plusMillis(600000)) // set expiry of refresh token to 10 minutes - you can configure it application.properties file
                 .build();

@@ -1,5 +1,6 @@
 package com.bwongo.core.merchant_mgt.jobs;
 
+import com.bwongo.core.merchant_mgt.service.MerchantApiService;
 import com.bwongo.core.merchant_mgt.service.MerchantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 public class MerchantScheduledEvents {
 
     private final MerchantService merchantService;
+    private final MerchantApiService merchantApiService;
 
     @Scheduled(fixedDelay = 60000, initialDelay = 30000)
     public void invalidateExpiredActivationCodes(){
@@ -29,4 +31,13 @@ public class MerchantScheduledEvents {
         }
     }
 
+    @Scheduled(fixedDelay = 60000, initialDelay = 100000)
+    public void invalidateExpiredApiCredentials(){
+        try {
+            log.info("Invalidating expired api credentials");
+            merchantApiService.invalidateExpiredCredentials();
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
+    }
 }

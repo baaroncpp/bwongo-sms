@@ -15,6 +15,7 @@ public class MessageMsgConstants {
     public static final String LOCATION_REQUIRED = "Location is required";
     public static final String MERCHANT_TYPE_REQUIRED = "MerchantType is required";
     public static final String INVALID_MERCHANT_TYPE = "Invalid merchantType";
+    public static final String ID_REQUIRED = "Id is required";
     public static final String MERCHANT_ID_REQUIRED = "MerchantId is required";
     public static final String SMS_COST_REQUIRED = "smsCost is required";
     public static final String IS_CUSTOMIZED_REQUIRED = "isCustomized is required";
@@ -25,4 +26,7 @@ public class MessageMsgConstants {
     public static final String CONTACT_ADMIN_MAX_FAILS = "Contact admin maximum number of fails reached";
     public static final String MERCHANT_ACTIVATION_NOT_FOUND = "MerchantActivation with code: %s not found";
     public static final String INVALID_ACTIVATION_CODE = "Invalid activation code: %s";
+    public static final String MERCHANT_SMS_SETTING_NOT_FOUND = "MerchantSmsSetting with ID: %s not found";
+    public static final String MERCHANT_ALREADY_HAS_SMS_SETTING = "Merchant :%s already has sms setting";
+    public static final String INVALID_NO_DAYS = "Number of days must be greater than 0";
 }

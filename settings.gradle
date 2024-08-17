@@ -19,3 +19,4 @@ plugins {
 rootProject.name = 'bwongo-sms'
 include 'commons'
 include 'core'
+include 'notification-service'

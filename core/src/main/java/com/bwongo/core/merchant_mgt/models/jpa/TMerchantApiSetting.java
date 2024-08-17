@@ -7,36 +7,27 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 
 /**
  * @Author bkaaron
  * @Project bwongo-sms
- * @Date 7/28/24
- * @LocalTime 3:59 PM
+ * @Date 8/14/24
+ * @LocalTime 6:41 AM
  **/
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
 @Entity
-@Table(name = "t_merchant_sms_configuration", schema = "core")
-public class TMerchantSmsConfiguration extends AuditEntity {
-    private String customizedTitle;
+@Table(name = "t_merchant_api_setting", schema = "core")
+public class TMerchantApiSetting extends AuditEntity {
     private TMerchant merchant;
-    private BigDecimal smsCost;
-    private int maxNumberOfCharactersPerSms;
-    private boolean isCustomized;
     private String apiKey;
     private String apiSecret;
     private boolean isKeyIssued;
+    private boolean isCredentialExpired;
     private Instant keyExpiryDate;
-
-    @Column(name = "customized_title")
-    public String getCustomizedTitle() {
-        return customizedTitle;
-    }
 
     @JoinColumn(name = "merchant_id", referencedColumnName = "id")
     @OneToOne(fetch = FetchType.LAZY)
@@ -44,20 +35,6 @@ public class TMerchantSmsConfiguration extends AuditEntity {
         return merchant;
     }
 
-    @Column(name = "sms_cost")
-    public BigDecimal getSmsCost() {
-        return smsCost;
-    }
-
-    @Column(name = "max_number_of_characters_per_sms")
-    public int getMaxNumberOfCharactersPerSms() {
-        return maxNumberOfCharactersPerSms;
-    }
-
-    @Column(name = "is_customized")
-    public boolean isCustomized() {
-        return isCustomized;
-    }
 
     @Column(name = "api_key")
     public String getApiKey() {
@@ -72,6 +49,11 @@ public class TMerchantSmsConfiguration extends AuditEntity {
     @Column(name = "is_key_issued")
     public boolean isKeyIssued() {
         return isKeyIssued;
+    }
+
+    @Column(name = "is_credential_expired")
+    public boolean isCredentialExpired() {
+        return isCredentialExpired;
     }
 
     @Column(name = "key_expiry_date")

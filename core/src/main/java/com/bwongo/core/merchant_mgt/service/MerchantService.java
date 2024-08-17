@@ -2,6 +2,7 @@ package com.bwongo.core.merchant_mgt.service;
 
 import com.bwongo.commons.exceptions.model.ExceptionType;
 import com.bwongo.commons.utils.Validate;
+import com.bwongo.core.base.model.dto.response.PageResponseDto;
 import com.bwongo.core.base.model.enums.ActivationCodeStatusEnum;
 import com.bwongo.core.base.model.enums.MerchantStatusEnum;
 import com.bwongo.core.base.repository.TAddressRepository;
@@ -9,23 +10,30 @@ import com.bwongo.core.base.repository.TCountryRepository;
 import com.bwongo.core.base.service.AuditService;
 import com.bwongo.core.base.service.BaseService;
 import com.bwongo.core.merchant_mgt.models.dto.request.MerchantRequestDto;
+import com.bwongo.core.merchant_mgt.models.dto.request.MerchantSmsSettingRequestDto;
+import com.bwongo.core.merchant_mgt.models.dto.request.MerchantSmsSettingUpdateRequestDto;
+import com.bwongo.core.merchant_mgt.models.dto.request.MerchantUpdateRequestDto;
 import com.bwongo.core.merchant_mgt.models.dto.response.MerchantResponseDto;
+import com.bwongo.core.merchant_mgt.models.dto.response.MerchantSmsSettingResponseDto;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchantActivation;
 import com.bwongo.core.merchant_mgt.repository.TMerchantActivationRepository;
 import com.bwongo.core.merchant_mgt.repository.TMerchantRepository;
-import com.bwongo.core.merchant_mgt.repository.TMerchantSmsConfigurationRepository;
+import com.bwongo.core.merchant_mgt.repository.TMerchantSmsSettingRepository;
 import com.bwongo.core.merchant_mgt.service.dto.MerchantDtoService;
 import com.bwongo.core.user_mgt.models.jpa.TUser;
 import com.bwongo.core.user_mgt.repository.TUserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import static com.bwongo.commons.text.StringUtil.getRandom6DigitString;
 import static com.bwongo.commons.utils.DateTimeUtil.getCurrentUTCTime;
 import static com.bwongo.core.base.utils.BaseMsgUtils.*;
+import static com.bwongo.core.base.utils.BaseUtils.pageToDto;
 import static com.bwongo.core.merchant_mgt.utils.MessageMsgConstants.*;
 import static com.bwongo.core.user_mgt.utils.UserMsgConstants.*;
 
@@ -44,12 +52,16 @@ public class MerchantService {
     private final MerchantDtoService merchantDtoService;
     private final BaseService baseService;
     private final TMerchantRepository merchantRepository;
-    private final TMerchantSmsConfigurationRepository merchantSmsConfigurationRepository;
+    private final TMerchantSmsSettingRepository merchantSmsSettingRepository;
     private final TUserRepository userRepository;
     private final TCountryRepository countryRepository;
     private final TAddressRepository addressRepository;
     private final TMerchantActivationRepository merchantActivationRepository;
 
+    @Value("${sms.max-number-characters}")
+    private int smsMaxNumberOfCharacters;
+
+    @Transactional
     public MerchantResponseDto addMerchant(MerchantRequestDto merchantRequestDto){
 
         merchantRequestDto.validate();
@@ -70,6 +82,7 @@ public class MerchantService {
         merchant.setActive(Boolean.FALSE);
         merchant.setMerchantCode(merchantCode);
         merchant.setCountry(country);
+        merchant.setNonVerifiedPhoneNumber(Boolean.FALSE);
         auditService.stampAuditedEntity(merchant);
         var savedMerchant = merchantRepository.save(merchant);
 
@@ -89,6 +102,54 @@ public class MerchantService {
         sendActivationCode(savedMerchant);
 
         return merchantDtoService.merchantToDto(savedMerchant);
+    }
+
+    public MerchantResponseDto updateMerchant(MerchantUpdateRequestDto merchantUpdateRequestDto){
+
+        merchantUpdateRequestDto.validate();
+
+        var merchantId = merchantUpdateRequestDto.merchantId();
+        var merchantMail = merchantUpdateRequestDto.email();
+        var merchantPhoneNumber = merchantUpdateRequestDto.phoneNumber();
+        var countryId = merchantUpdateRequestDto.countryId();
+
+        var merchant = getMerchantById(merchantId);
+
+        var existingCountry = countryRepository.findById(countryId);
+        Validate.isPresent(existingCountry, COUNTRY_WITH_ID_NOT_FOUND);
+        var country = existingCountry.get();
+
+        if(!merchantPhoneNumber.equals(merchant.getPhoneNumber()))
+            Validate.isTrue(!merchantRepository.existsByPhoneNumber(merchantPhoneNumber), ExceptionType.BAD_REQUEST, PHONE_NUMBER_ALREADY_TAKEN, merchantPhoneNumber);
+
+        if(!merchantMail.equals(merchant.getEmail()))
+            Validate.isTrue(!merchantRepository.existsByEmail(merchantMail), ExceptionType.BAD_REQUEST, EMAIL_ALREADY_TAKEN, merchantMail);
+
+        var updatedMerchant = merchantDtoService.updateDtoToMerchant(merchantUpdateRequestDto);
+        updatedMerchant.setId(merchantId);
+        updatedMerchant.setCreatedBy(merchant.getCreatedBy());
+        updatedMerchant.setCreatedOn(merchant.getCreatedOn());
+        updatedMerchant.setActive(merchant.isActive());
+        updatedMerchant.setMerchantCode(merchant.getMerchantCode());
+        updatedMerchant.setCountry(country);
+        updatedMerchant.setMerchantStatus(merchant.getMerchantStatus());
+        updatedMerchant.setActivatedBy(merchant.getActivatedBy());
+        updatedMerchant.setNonVerifiedPhoneNumber(Boolean.FALSE);
+
+        auditService.stampAuditedEntity(merchant);
+        var savedMerchant = merchantRepository.save(merchant);
+
+        return merchantDtoService.merchantToDto(savedMerchant);
+    }
+
+    public MerchantResponseDto getMerchant(Long merchantId){
+        return merchantDtoService.merchantToDto(getMerchantById(merchantId));
+    }
+
+    public PageResponseDto getAll(Pageable pageable){
+        var merchantPage = merchantRepository.findAll(pageable);
+        var merchantList = merchantPage.stream().map(merchantDtoService::merchantToDto).toList();
+        return pageToDto(merchantPage, merchantList);
     }
 
     public void resendActivationCode(Long merchantId){
@@ -145,6 +206,7 @@ public class MerchantService {
         merchant.setActive(Boolean.TRUE);
         merchant.setActivatedBy(getLoggedInUser());
         merchant.setMerchantStatus(MerchantStatusEnum.ACTIVE);
+        merchant.setNonVerifiedPhoneNumber(Boolean.TRUE);
 
         auditService.stampAuditedEntity(merchant);
         var activatedMerchant = merchantRepository.save(merchant);
@@ -176,6 +238,42 @@ public class MerchantService {
         });
 
         return merchantDtoService.merchantToDto(activatedMerchant);
+    }
+
+    public MerchantSmsSettingResponseDto addMerchantSmsConfiguration(MerchantSmsSettingRequestDto merchantSmsSettingRequestDto){
+
+        merchantSmsSettingRequestDto.validate();
+        var merchantId = merchantSmsSettingRequestDto.merchantId();
+        var merchant = getMerchantById(merchantId);
+
+        var existingMerchantSmsSetting = merchantSmsSettingRepository.findByMerchant(merchant);
+        Validate.isTrue(existingMerchantSmsSetting.isEmpty(), ExceptionType.BAD_REQUEST, MERCHANT_ALREADY_HAS_SMS_SETTING, merchant.getMerchantName());
+
+        var merchantSmsSetting = merchantDtoService.dtoToMerchantSmsSetting(merchantSmsSettingRequestDto);
+        merchantSmsSetting.setMaxNumberOfCharactersPerSms(smsMaxNumberOfCharacters);
+        merchantSmsSetting.setMerchant(merchant);
+        auditService.stampLongEntity(merchantSmsSetting);
+
+        var savedMerchantSmsSetting = merchantSmsSettingRepository.save(merchantSmsSetting);
+
+        return merchantDtoService.merchantSmsSettingToDto(savedMerchantSmsSetting);
+    }
+
+    public MerchantSmsSettingResponseDto updateMerchantSmsConfiguration(MerchantSmsSettingUpdateRequestDto merchantSmsSettingUpdateRequestDto){
+
+        merchantSmsSettingUpdateRequestDto.validate();
+        var smsSettingId = merchantSmsSettingUpdateRequestDto.id();
+
+        var existingMerchantSmsSetting = merchantSmsSettingRepository.findById(smsSettingId);
+        Validate.isPresent(existingMerchantSmsSetting, MERCHANT_SMS_SETTING_NOT_FOUND, smsSettingId);
+        var smsSetting = existingMerchantSmsSetting.get();
+
+        smsSetting.setSmsCost(merchantSmsSettingUpdateRequestDto.smsCost());
+        smsSetting.setCustomized(merchantSmsSettingUpdateRequestDto.isCustomized());
+        smsSetting.setCustomizedTitle(merchantSmsSettingUpdateRequestDto.customizedTitle());
+        auditService.stampLongEntity(smsSetting);
+
+        return merchantDtoService.merchantSmsSettingToDto(merchantSmsSettingRepository.save(smsSetting));
     }
 
     @Transactional
