@@ -26,4 +26,5 @@ public class BaseMsgUtils {
     public static final String DISTRICT_ALREADY_EXISTS_COUNTRY = "district %s already exists in %s";
     public static final String DISTRICT_NOT_FOUND = "district with %s not found";
     public static final String ACCEPTABLE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String SMS_TOPIC = "smsTopic";
 }

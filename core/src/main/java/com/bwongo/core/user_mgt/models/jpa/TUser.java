@@ -32,7 +32,7 @@ public class TUser extends BaseEntity {
     private UserTypeEnum userType;
     private Boolean nonVerifiedEmail;
     private String imagePath;
-    private TMerchant merchant;
+    private Long merchantId;
 
     @Column(name = "first_name")
     public String getFirstName() {
@@ -68,15 +68,18 @@ public class TUser extends BaseEntity {
     public boolean isCredentialExpired() {
         return credentialExpired;
     }
+
     @JoinColumn(name = "user_group_id", referencedColumnName = "id", insertable = true, updatable = false)
     @OneToOne(fetch = FetchType.LAZY)
     public TUserGroup getUserGroup() {
         return userGroup;
     }
+
     @Column(name = "approved")
     public boolean isApproved() {
         return approved;
     }
+
     @Column(name = "is_deleted")
     public boolean getDeleted() {
         return isDeleted;
@@ -108,9 +111,13 @@ public class TUser extends BaseEntity {
         return imagePath;
     }
 
-    @JoinColumn(name = "merchant_id", referencedColumnName = "id")
-    @OneToOne(fetch = FetchType.EAGER)
-    public TMerchant getMerchant() {
-        return merchant;
+    @Column(name = "is_deleted")
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    @Column(name = "merchant_id")
+    public Long getMerchantId() {
+        return merchantId;
     }
 }

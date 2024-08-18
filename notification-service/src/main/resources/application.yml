@@ -1,3 +1,10 @@
 spring:
   application:
     name: notification-service
+  kafka:
+    consumer:
+      bootstrap-servers: ${KAFKA_HOST:localhost}:${KAFKA_PORT:9092}
+      group-id: sms-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.stringSerializer
+      value-deserializer: org.apache.kafka.common.serialization.stringSerializer

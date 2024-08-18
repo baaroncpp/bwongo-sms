@@ -54,7 +54,7 @@ public class TMerchantActivation extends BaseEntity {
         return isActive;
     }
 
-    @Column(name = "activatioin_code_status")
+    @Column(name = "activation_code_status")
     @Enumerated(EnumType.STRING)
     public ActivationCodeStatusEnum getActivationCodeStatus() {
         return activationCodeStatus;

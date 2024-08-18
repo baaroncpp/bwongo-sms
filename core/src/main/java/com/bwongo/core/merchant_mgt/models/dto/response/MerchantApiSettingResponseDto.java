@@ -1,6 +1,5 @@
 package com.bwongo.core.merchant_mgt.models.dto.response;
 
-import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
 import com.bwongo.core.user_mgt.models.dto.response.UserResponseDto;
 
 import java.time.Instant;
