@@ -3,6 +3,7 @@ package com.bwongo.core.base.api;
 import com.bwongo.core.base.model.dto.request.CountryRequestDto;
 import com.bwongo.core.base.model.dto.response.CountryResponseDto;
 import com.bwongo.core.base.service.BaseService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +16,7 @@ import java.util.List;
  * @Date 3/12/24
  * @LocalTime 3:38 PM
  **/
+@Tag(name = "Base Api", description = "Manages countries and location")
 @RestController
 @RequestMapping("/api/v1/")
 @RequiredArgsConstructor

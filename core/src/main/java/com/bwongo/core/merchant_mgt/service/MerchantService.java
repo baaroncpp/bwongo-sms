@@ -94,7 +94,7 @@ public class MerchantService {
         user.setAccountLocked(Boolean.FALSE);
         user.setCredentialExpired(Boolean.FALSE);
         user.setApproved(Boolean.FALSE);
-        user.setMerchant(savedMerchant);
+        user.setMerchantId(savedMerchant.getId());
         auditService.stampLongEntity(user);
 
         userRepository.save(user);

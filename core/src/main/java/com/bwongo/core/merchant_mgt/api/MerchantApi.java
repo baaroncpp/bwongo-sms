@@ -5,6 +5,7 @@ import com.bwongo.core.merchant_mgt.models.dto.request.MerchantRequestDto;
 import com.bwongo.core.merchant_mgt.models.dto.request.MerchantUpdateRequestDto;
 import com.bwongo.core.merchant_mgt.models.dto.response.MerchantResponseDto;
 import com.bwongo.core.merchant_mgt.service.MerchantService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -20,6 +21,7 @@ import static io.netty.handler.codec.http.HttpHeaders.Values.APPLICATION_JSON;
  * @Date 8/9/24
  * @LocalTime 10:34 AM
  **/
+@Tag(name = "Merchant Api", description = "Manages manages merchant and merchant configuration CRUD operations")
 @RestController
 @RequestMapping("/api/v1/merchant")
 @RequiredArgsConstructor

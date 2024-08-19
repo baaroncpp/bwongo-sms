@@ -8,10 +8,9 @@ package com.bwongo.core.base.model.enums;
  **/
 public enum TransactionTypeEnum {
     MOMO_DEPOSIT("depositing money from MOMO to account"),
-    MOMO_WITHDRAW("withdrawing money from wallet to MOMO"),
     ACCOUNT_DEBIT("money leaving account"),
     ACCOUNT_CREDIT("money coming to account"),
-    REFUND("refunding money from system account to MOMO");
+    REFUND("refunding money from system account to client account");
 
     private final String description;
 

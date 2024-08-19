@@ -1,4 +1,4 @@
-package com.bwongo.core.config;
+package com.bwongo.core.base.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;

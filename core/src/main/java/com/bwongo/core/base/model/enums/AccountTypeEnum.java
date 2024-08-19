@@ -7,5 +7,5 @@ package com.bwongo.core.base.model.enums;
  * @LocalTime 9:48 PM
  **/
 public enum AccountTypeEnum {
-    ASSETS, EQUITY, EXPENSES, INCOME, LIABILITY
+    SYSTEM, MERCHANT
 }

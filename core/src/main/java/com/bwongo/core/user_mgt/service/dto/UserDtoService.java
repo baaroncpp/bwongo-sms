@@ -163,7 +163,7 @@ public class UserDtoService {
                 user.getUserType(),
                 user.getNonVerifiedEmail(),
                 user.getImagePath(),
-                user.getMerchant().getId()
+                user.getMerchantId()
         );
     }
 

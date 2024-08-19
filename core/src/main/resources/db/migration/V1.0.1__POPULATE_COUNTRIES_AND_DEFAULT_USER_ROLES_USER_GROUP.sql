@@ -26,7 +26,7 @@ VALUES
 
 WITH
     userGroup AS (SELECT id FROM t_user_group WHERE user_group_name = 'ADMIN_GROUP')
-INSERT INTO t_user(username, password, user_group_id, user_type, account_locked, account_expired, cred_expired)
+INSERT INTO t_user(email, password, user_group_id, user_type, account_locked, account_expired, cred_expired)
 VALUES('admin@bwongo.com', '$2y$12$R2gix.Nr/E4j9pmKVQHA4u/x.oyWf/wEPUBcQwxYerQSwqQXMcWZO', (select id from userGroup), 'ADMIN', FALSE, FALSE, FALSE);
 
 INSERT INTO t_country (name,iso_alpha_2,iso_alpha_3,iso_numeric) VALUES

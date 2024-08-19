@@ -1,13 +1,13 @@
 package com.bwongo.core.merchant_mgt.service;
 
-import com.bwongo.commons.exceptions.InsufficientAuthenticationException;
-import com.bwongo.commons.utils.DateTimeUtil;
+import com.bwongo.commons.utils.Validate;
 import com.bwongo.core.base.service.AuditService;
 import com.bwongo.core.merchant_mgt.models.dto.request.MerchantApiSettingRequestDto;
 import com.bwongo.core.merchant_mgt.models.dto.response.MerchantApiSettingResponseDto;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchantApiSetting;
 import com.bwongo.core.merchant_mgt.repository.TMerchantApiSettingRepository;
+import com.bwongo.core.merchant_mgt.repository.TMerchantRepository;
 import com.bwongo.core.merchant_mgt.service.dto.MerchantDtoService;
 import com.bwongo.core.user_mgt.repository.TUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 
-import static com.bwongo.commons.utils.DateTimeUtil.getCurrentUTCTime;
 import static com.bwongo.core.merchant_mgt.utils.MerchantUtils.generateApiSecretAndSecret;
+import static com.bwongo.core.merchant_mgt.utils.MessageMsgConstants.MERCHANT_NOT_FOUND;
 
 /**
  * @Author bkaaron
@@ -39,6 +39,7 @@ public class MerchantApiService {
     private final MerchantDtoService merchantDtoService;
     private final AuditService auditService;
     private final TUserRepository userRepository;
+    private final TMerchantRepository merchantRepository;
 
     public MerchantApiSettingResponseDto getMerchantApiSetting(MerchantApiSettingRequestDto merchantApiSettingRequestDto) {
 
@@ -81,6 +82,11 @@ public class MerchantApiService {
     private TMerchant getLoggedInUserMerchant(){
         var userId = auditService.getLoggedInUser().getId();
         var existingUser = userRepository.findById(userId);
-        return existingUser.get().getMerchant();
+        var merchantId = existingUser.get().getMerchantId();
+
+        var existingMerchant = merchantRepository.findById(merchantId);
+        Validate.isPresent(existingMerchant, MERCHANT_NOT_FOUND, merchantId);
+
+        return existingMerchant.get();
     }
 }

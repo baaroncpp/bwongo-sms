@@ -111,11 +111,6 @@ public class TUser extends BaseEntity {
         return imagePath;
     }
 
-    @Column(name = "is_deleted")
-    public boolean isDeleted() {
-        return isDeleted;
-    }
-
     @Column(name = "merchant_id")
     public Long getMerchantId() {
         return merchantId;

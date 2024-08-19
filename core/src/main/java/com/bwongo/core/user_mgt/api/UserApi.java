@@ -5,6 +5,7 @@ import com.bwongo.core.user_mgt.models.dto.request.*;
 import com.bwongo.core.user_mgt.models.dto.response.UserApprovalResponseDto;
 import com.bwongo.core.user_mgt.models.dto.response.UserResponseDto;
 import com.bwongo.core.user_mgt.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -19,6 +20,7 @@ import static io.netty.handler.codec.http.HttpHeaders.Values.APPLICATION_JSON;
  * @Date 3/16/24
  * @LocalTime 3:53 AM
  **/
+@Tag(name = "User Api", description = "Manages user CRUD operations")
 @RestController
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor

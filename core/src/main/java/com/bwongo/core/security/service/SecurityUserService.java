@@ -31,7 +31,7 @@ public class SecurityUserService {
 
     public SecurityUserDetails getSecurityUserDetails(String username) {
 
-        TUser user = userRepository.findByUsername(username).orElseThrow(
+        TUser user = userRepository.findByEmail(username).orElseThrow(
                 () -> new UsernameNotFoundException(String.format("username: %s not found", username))
         );
 

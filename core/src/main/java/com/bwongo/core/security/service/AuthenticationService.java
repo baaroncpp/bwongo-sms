@@ -48,7 +48,7 @@ public class AuthenticationService {
         System.out.println(authentication.isAuthenticated());
         Validate.isTrue(authentication.isAuthenticated(), ExceptionType.BAD_CREDENTIALS, "Invalid user !");
 
-        var user = userRepository.findByUsername(authenticationRequestDto.getEmail()).orElseThrow(
+        var user = userRepository.findByEmail(authenticationRequestDto.getEmail()).orElseThrow(
                 () -> new UsernameNotFoundException("User not found")
         );
         var username = user.getEmail();

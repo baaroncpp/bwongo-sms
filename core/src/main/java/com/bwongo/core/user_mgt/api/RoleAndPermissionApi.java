@@ -6,6 +6,7 @@ import com.bwongo.core.user_mgt.models.dto.response.PermissionResponseDto;
 import com.bwongo.core.user_mgt.models.dto.response.RoleResponseDto;
 import com.bwongo.core.user_mgt.models.dto.response.UserGroupResponseDto;
 import com.bwongo.core.user_mgt.service.RoleService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,6 +21,7 @@ import static io.netty.handler.codec.http.HttpHeaders.Values.APPLICATION_JSON;
  * @Date 3/13/24
  * @LocalTime 2:57 PM
  **/
+@Tag(name = "Role, Permission and user group Api", description = "Manages user roles, permissions and user groups with the corresponding group authorities")
 @RestController
 @RequestMapping("api/v1")
 @RequiredArgsConstructor
