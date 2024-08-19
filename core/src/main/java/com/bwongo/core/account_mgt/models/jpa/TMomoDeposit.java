@@ -5,6 +5,9 @@ import com.bwongo.core.base.model.enums.TransactionStatusEnum;
 import com.bwongo.core.base.model.jpa.AuditEntity;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -15,6 +18,9 @@ import java.math.BigDecimal;
  * @Date 8/19/24
  * @LocalTime 2:35 PM
  **/
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Setter
 @Entity
 @Table(name = "t_momo_deposit", schema = "core")
