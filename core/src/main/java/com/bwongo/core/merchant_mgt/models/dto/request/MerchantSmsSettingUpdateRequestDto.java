@@ -5,7 +5,7 @@ import com.bwongo.commons.utils.Validate;
 
 import java.math.BigDecimal;
 
-import static com.bwongo.core.merchant_mgt.utils.MessageMsgConstants.*;
+import static com.bwongo.core.merchant_mgt.utils.MerchantMsgConstants.*;
 
 /**
  * @Author bkaaron

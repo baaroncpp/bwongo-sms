@@ -122,7 +122,7 @@ public class MerchantDtoService {
         if(merchantRequestDto.merchantUser() == null)
             return null;
 
-        return userDtoService.dtoToTUser(merchantRequestDto.merchantUser());
+        return userDtoService.dtoToMerchantUser(merchantRequestDto.merchantUser());
     }
 
     public MerchantApiSettingResponseDto merchantApiSettingToDto(TMerchantApiSetting merchantApiSetting){

@@ -6,7 +6,7 @@ import com.bwongo.commons.utils.Validate;
 import com.bwongo.core.base.model.enums.MerchantTypeEnum;
 
 import static com.bwongo.core.base.utils.EnumValidation.isMerchantTypeEnum;
-import static com.bwongo.core.merchant_mgt.utils.MessageMsgConstants.*;
+import static com.bwongo.core.merchant_mgt.utils.MerchantMsgConstants.*;
 import static com.bwongo.core.user_mgt.utils.UserMsgConstants.*;
 import static com.bwongo.core.user_mgt.utils.UserMsgConstants.INVALID_PHONE_NUMBER;
 

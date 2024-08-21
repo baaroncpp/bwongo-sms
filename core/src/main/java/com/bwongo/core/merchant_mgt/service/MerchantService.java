@@ -5,6 +5,7 @@ import com.bwongo.commons.utils.Validate;
 import com.bwongo.core.base.model.dto.response.PageResponseDto;
 import com.bwongo.core.base.model.enums.ActivationCodeStatusEnum;
 import com.bwongo.core.base.model.enums.MerchantStatusEnum;
+import com.bwongo.core.base.model.enums.UserTypeEnum;
 import com.bwongo.core.base.repository.TAddressRepository;
 import com.bwongo.core.base.repository.TCountryRepository;
 import com.bwongo.core.base.service.AuditService;
@@ -22,6 +23,8 @@ import com.bwongo.core.merchant_mgt.repository.TMerchantRepository;
 import com.bwongo.core.merchant_mgt.repository.TMerchantSmsSettingRepository;
 import com.bwongo.core.merchant_mgt.service.dto.MerchantDtoService;
 import com.bwongo.core.user_mgt.models.jpa.TUser;
+import com.bwongo.core.user_mgt.models.jpa.TUserGroup;
+import com.bwongo.core.user_mgt.repository.TUserGroupRepository;
 import com.bwongo.core.user_mgt.repository.TUserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +37,7 @@ import static com.bwongo.commons.text.StringUtil.getRandom6DigitString;
 import static com.bwongo.commons.utils.DateTimeUtil.getCurrentUTCTime;
 import static com.bwongo.core.base.utils.BaseMsgUtils.*;
 import static com.bwongo.core.base.utils.BaseUtils.pageToDto;
-import static com.bwongo.core.merchant_mgt.utils.MessageMsgConstants.*;
+import static com.bwongo.core.merchant_mgt.utils.MerchantMsgConstants.*;
 import static com.bwongo.core.user_mgt.utils.UserMsgConstants.*;
 
 /**
@@ -57,6 +60,7 @@ public class MerchantService {
     private final TCountryRepository countryRepository;
     private final TAddressRepository addressRepository;
     private final TMerchantActivationRepository merchantActivationRepository;
+    private final TUserGroupRepository userGroupRepository;
 
     @Value("${sms.max-number-characters}")
     private int smsMaxNumberOfCharacters;
@@ -95,6 +99,8 @@ public class MerchantService {
         user.setCredentialExpired(Boolean.FALSE);
         user.setApproved(Boolean.FALSE);
         user.setMerchantId(savedMerchant.getId());
+        user.setUserType(UserTypeEnum.MERCHANT);
+        user.setUserGroup(getUserGroupByName(MERCHANT_GROUP));
         auditService.stampLongEntity(user);
 
         userRepository.save(user);
@@ -330,5 +336,11 @@ public class MerchantService {
     private TUser getLoggedInUser(){
         var userId = auditService.getLoggedInUser().getId();
         return userRepository.findById(userId).get();
+    }
+
+    private TUserGroup getUserGroupByName(String groupName){
+        var existingUserGroup = userGroupRepository.findTUserGroupByName(groupName);
+        Validate.isPresent(existingUserGroup, USER_GROUP_NAME_NOT_FOUND, groupName);
+        return existingUserGroup.get();
     }
 }

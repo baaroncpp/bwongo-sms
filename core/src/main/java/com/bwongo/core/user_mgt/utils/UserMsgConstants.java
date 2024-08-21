@@ -45,7 +45,8 @@ public class UserMsgConstants {
     public static final String DELETE_DESCRIPTION = "DELETE PERMISSION";
     public static final String UPDATE_DESCRIPTION = "UPDATE PERMISSION";
     public static final String USERNAME_REQUIRED = "Username is required";
-    public static final String USERNAME_TAKEN = "Username %s is already taken";
+    public static final String USERNAME_TAKEN = "email %s is already taken";
+    public static final String INVALID_USER_GROUP = "invalid user group, options: ADMIN, SUPER_ADMIN";
     public static final String PASSWORD_REQUIRED = "Password is required";
     public static final String USER_TYPE_REQUIRED = "User type is required";
     public static final String USERNAME_SHOULD_CONTAIN_ONLY_CHARS_AND_NUMBERS = "Username contains invalid characters";
@@ -56,7 +57,7 @@ public class UserMsgConstants {
     public static final String OLD_NEW_SAME_PASSWORD = "oldPassword and newPassword cannot be the same";
     public static final String OLD_PASSWORDS_DONT_MATCH = "invalid oldPassword";
     public static final String PASSWORD_USED_BEFORE = "newPassword has been used before";
-    public static final String VALID_USER_TYPE = "Invalid userType: it should be ADMIN, SYSTEM_ADMIN, SACCO_ADMIN, SYSTEM_FINANCE, SYSTEM_OPERATION, SACCO_FINANCE, SACCO_OPERATION, TELLER";
+    public static final String VALID_USER_TYPE = "Invalid userType: it should be ADMIN, SUPER_ADMIN";
     public static final String VALID_SCHOOL_USER_TYPE = "Invalid userType: it should be DRIVER or SCHOOL_ADMIN or SCHOOL_STAFF";
     public static final String USER_GROUP_DOES_NOT_EXIST = "User group with ID: %s does not exist";
     public static final String PASSWORD_CANT_BE_UPDATED = "Password field cannot be updated";
@@ -81,6 +82,8 @@ public class UserMsgConstants {
     public static final String SECOND_PHONE_NUMBER_ALREADY_TAKEN = "Second phone number %s is already taken";
     public static final String APPROVAL_STATUS_REQUIRED = "Approval status is required";
     public static final String INVALID_APPROVAL_STATUS = "Invalid approval status: it should be APPROVED, REJECTED or PENDING";
+    public static final String PENDING_INVALID_APPROVAL = "Invalid approval status: it should be APPROVED or REJECTED";
+    public static final String INVALID_APPROVAL = "%s is the current status";
     public static final String USER_APPROVAL_NOT_FOUND = "User approval with ID: %s not found";
     public static final String USER_ACCOUNT_IS_ALREADY_LOCKED = "User account is already locked";
     public static final String ROLE_EXISTS = "Role %s already exists";
@@ -94,4 +97,5 @@ public class UserMsgConstants {
     public static final String PERMISSION_ALREADY_ASSIGNED_TO_USER_GROUP = "Permission %s, already assigned to user group %s";
     public static final String USER_GROUP_ALREADY_EXISTS = "User group %s already exists";
     public static final String APPROVAL_ID_REQUIRED = "approvalId is required";
+    public static final String USER_GROUP_NAME_NOT_FOUND = "User group with name: %s does not exist";
 }

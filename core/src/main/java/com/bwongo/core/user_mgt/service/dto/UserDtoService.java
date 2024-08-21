@@ -1,14 +1,17 @@
 package com.bwongo.core.user_mgt.service.dto;
 
 import com.bwongo.core.base.model.dto.response.AddressResponseDto;
+import com.bwongo.core.base.model.enums.UserTypeEnum;
 import com.bwongo.core.base.model.jpa.TAddress;
 import com.bwongo.core.base.service.dto.BaseDtoService;
 import com.bwongo.core.user_mgt.models.dto.request.ChangePasswordRequestDto;
+import com.bwongo.core.user_mgt.models.dto.request.MerchantUserRequestDto;
 import com.bwongo.core.user_mgt.models.dto.request.UserGroupRequestDto;
 import com.bwongo.core.user_mgt.models.dto.request.UserRequestDto;
 import com.bwongo.core.user_mgt.models.dto.response.*;
 import com.bwongo.core.user_mgt.models.jpa.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
 public class UserDtoService {
 
     private final BaseDtoService baseDtoService;
+    private final PasswordEncoder passwordEncoder;
 
     public UserGroupResponseDto userGroupToDto(TUserGroup userGroup){
 
@@ -123,6 +127,20 @@ public class UserDtoService {
         );
     }
 
+    public TUser dtoToMerchantUser(MerchantUserRequestDto userRequestDto){
+
+        if(userRequestDto == null){
+            return null;
+        }
+
+        return TUser.builder()
+                .email(userRequestDto.email())
+                .password(passwordEncoder.encode(userRequestDto.password()))
+                .secondName(userRequestDto.secondName())
+                .firstName(userRequestDto.firstName())
+                .build();
+    }
+
     public TUser dtoToTUser(UserRequestDto userRequestDto){
 
         if(userRequestDto == null){
@@ -132,12 +150,14 @@ public class UserDtoService {
         var userGroup = new TUserGroup();
         userGroup.setId(userRequestDto.userGroupId());
 
-        var user = new TUser();
-        user.setEmail(userRequestDto.email());
-        user.setPassword(userRequestDto.password());
-        user.setUserGroup(userGroup);
-
-        return user;
+        return TUser.builder()
+                .email(userRequestDto.email())
+                .password(passwordEncoder.encode(userRequestDto.password()))
+                .secondName(userRequestDto.secondName())
+                .firstName(userRequestDto.firstName())
+                .userType(UserTypeEnum.valueOf(userRequestDto.userType()))
+                .userGroup(userGroup)
+                .build();
     }
 
     public UserResponseDto userToDto(TUser user){

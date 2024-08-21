@@ -6,9 +6,9 @@ package com.bwongo.core.merchant_mgt.utils;
  * @Date 7/31/24
  * @LocalTime 1:12 PM
  **/
-public class MessageMsgConstants {
+public class MerchantMsgConstants {
 
-    private MessageMsgConstants() {}
+    private MerchantMsgConstants() {}
 
     public static final String NULL_COUNTRY_ID = "countryId is required";
     public static final String MERCHANT_NAME_REQUIRED = "MerchantName is required";
@@ -29,4 +29,7 @@ public class MessageMsgConstants {
     public static final String MERCHANT_SMS_SETTING_NOT_FOUND = "MerchantSmsSetting with ID: %s not found";
     public static final String MERCHANT_ALREADY_HAS_SMS_SETTING = "Merchant :%s already has sms setting";
     public static final String INVALID_NO_DAYS = "Number of days must be greater than 0";
+    public static final String MERCHANT_INVALID_USER_TYPE = "Invalid merchant user type: %s, use MERCHANT";
+    public static final String MERCHANT_GROUP = "MERCHANT_GROUP";
+    public static final String NOT_MERCHANT_USER = "Not a merchant user";
 }

@@ -1,6 +1,12 @@
-INSERT INTO t_user_group(user_group_name, group_note) VALUES('ADMIN_GROUP', 'system administrative users');
+INSERT INTO t_user_group(user_group_name, group_note)
+VALUES
+    ('ADMIN_GROUP', 'system administrative users'),
+    ('MERCHANT_GROUP', 'merchant users');
 
-INSERT INTO t_role(name, note) values('ADMIN_ROLE', 'administrative role');
+INSERT INTO t_role(name, note)
+VALUES
+    ('ADMIN_ROLE', 'administrative role'),
+    ('MERCHANT_ROLE', 'merchant role');
 
 WITH role AS (SELECT id FROM t_role WHERE name = 'ADMIN_ROLE')
 INSERT INTO t_permission(role_id, permission_name)
@@ -23,6 +29,30 @@ VALUES
     ((select id from userGroup), (select id from write)),
     ((select id from userGroup), (select id from update)),
     ((select id from userGroup), (select id from delete));
+
+
+WITH role AS (SELECT id FROM t_role WHERE name = 'MERCHANT_ROLE')
+INSERT INTO t_permission(role_id, permission_name)
+VALUES
+    ((select id from role), 'MERCHANT_ROLE.WRITE'),
+    ((select id from role), 'MERCHANT_ROLE.READ'),
+    ((select id from role), 'MERCHANT_ROLE.UPDATE'),
+    ((select id from role), 'MERCHANT_ROLE.DELETE');
+
+WITH
+    userGroup AS (SELECT id FROM t_user_group WHERE user_group_name = 'MERCHANT_GROUP'),
+    read AS (SELECT id FROM t_permission WHERE permission_name = 'MERCHANT_ROLE.READ'),
+    write AS (SELECT id FROM t_permission WHERE permission_name = 'MERCHANT_ROLE.WRITE'),
+    update AS (SELECT id FROM t_permission WHERE permission_name = 'MERCHANT_ROLE.UPDATE'),
+    delete AS (SELECT id FROM t_permission WHERE permission_name = 'MERCHANT_ROLE.DELETE')
+
+INSERT INTO t_group_authority(user_group_id, permission_id)
+VALUES
+    ((select id from userGroup), (select id from read)),
+    ((select id from userGroup), (select id from write)),
+    ((select id from userGroup), (select id from update)),
+    ((select id from userGroup), (select id from delete));
+
 
 WITH
     userGroup AS (SELECT id FROM t_user_group WHERE user_group_name = 'ADMIN_GROUP')

@@ -4,10 +4,10 @@ import com.bwongo.commons.exceptions.model.ExceptionType;
 import com.bwongo.commons.text.StringRegExUtil;
 import com.bwongo.commons.utils.Validate;
 import com.bwongo.core.base.model.enums.MerchantTypeEnum;
-import com.bwongo.core.user_mgt.models.dto.request.UserRequestDto;
+import com.bwongo.core.user_mgt.models.dto.request.MerchantUserRequestDto;
 
 import static com.bwongo.core.base.utils.EnumValidation.isMerchantTypeEnum;
-import static com.bwongo.core.merchant_mgt.utils.MessageMsgConstants.*;
+import static com.bwongo.core.merchant_mgt.utils.MerchantMsgConstants.*;
 import static com.bwongo.core.user_mgt.utils.UserMsgConstants.*;
 
 /**
@@ -23,7 +23,7 @@ public record MerchantRequestDto(
         String merchantName,
         String location,
         String merchantType,
-        UserRequestDto merchantUser
+        MerchantUserRequestDto merchantUser
 ) {
     public void validate(){
         merchantUser.validate();

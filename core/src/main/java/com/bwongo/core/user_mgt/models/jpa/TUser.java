@@ -4,6 +4,9 @@ import com.bwongo.core.base.model.enums.UserTypeEnum;
 import com.bwongo.core.base.model.jpa.BaseEntity;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -12,6 +15,9 @@ import lombok.Setter;
  * @Date 3/10/24
  * @LocalTime 12:41 PM
  **/
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Setter
 @Entity
 @Table(name = "t_user", schema = "core")

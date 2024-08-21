@@ -19,7 +19,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 import static com.bwongo.core.merchant_mgt.utils.MerchantUtils.generateApiSecretAndSecret;
-import static com.bwongo.core.merchant_mgt.utils.MessageMsgConstants.MERCHANT_NOT_FOUND;
+import static com.bwongo.core.merchant_mgt.utils.MerchantMsgConstants.MERCHANT_NOT_FOUND;
 
 /**
  * @Author bkaaron

@@ -48,10 +48,9 @@ public class UserApi {
     }
 
     @PreAuthorize("hasAnyAuthority('USER_ROLE.UPDATE','ADMIN_ROLE.UPDATE')")
-    @PutMapping(path = "user-id/{id}", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
-    public UserResponseDto update(@RequestBody UserUpdateRequestDto userUpdateRequestDto,
-                                  @PathVariable("id") Long id) {
-        return userService.updateUser(id, userUpdateRequestDto);
+    @PutMapping(consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
+    public UserResponseDto update(@RequestBody UserUpdateRequestDto userUpdateRequestDto) {
+        return userService.updateUser(userUpdateRequestDto);
     }
 
     @PreAuthorize("hasAnyAuthority('USER_ROLE.DELETE','ADMIN_ROLE.DELETE')")
