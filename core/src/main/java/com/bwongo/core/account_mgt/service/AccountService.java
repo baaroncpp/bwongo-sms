@@ -6,11 +6,13 @@ import com.bwongo.core.account_mgt.models.dto.request.MomoDepositRequestDto;
 import com.bwongo.core.account_mgt.models.dto.response.AccountResponseDto;
 import com.bwongo.core.account_mgt.models.dto.response.MomoDepositResponseDto;
 import com.bwongo.core.account_mgt.models.jpa.TAccount;
+import com.bwongo.core.account_mgt.models.jpa.TMomoDeposit;
 import com.bwongo.core.account_mgt.repository.TAccountRepository;
 import com.bwongo.core.account_mgt.repository.TAccountTransactionRepository;
 import com.bwongo.core.account_mgt.repository.TMomoDepositRepository;
 import com.bwongo.core.account_mgt.service.dto.AccountDtoService;
 import com.bwongo.core.base.model.dto.response.PageResponseDto;
+import com.bwongo.core.base.model.enums.TransactionStatusEnum;
 import com.bwongo.core.base.service.AuditService;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
 import com.bwongo.core.merchant_mgt.repository.TMerchantRepository;
@@ -52,7 +54,8 @@ public class AccountService {
     }
 
     public void updateMomoPendingDeposits(){
-        //TODO
+        var pendingMomoDeposits = momoDepositRepository.findAllByTransactionStatus(TransactionStatusEnum.PENDING);
+        pendingMomoDeposits.forEach(this::updateMomoDeposit);
     }
 
     public PageResponseDto getMerchantMomoDeposits(Long merchantId, Pageable pageable) {
@@ -109,6 +112,14 @@ public class AccountService {
     public AccountResponseDto getMerchantAccount(){
         return accountDtoService
                 .accountToDto(getAccountByMerchant(getLoggedInUserMerchant()));
+    }
+
+    private void updateMomoDeposit(TMomoDeposit momoDeposit){
+        try{
+            //TODO call Service Provider check status to update the deposit
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
     }
 
     private TMerchant getMerchantById(Long id){

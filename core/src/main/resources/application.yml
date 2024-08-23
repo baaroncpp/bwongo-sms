@@ -34,6 +34,7 @@ spring:
 sms:
   default-title: BWONGO-SMS
   max-number-characters: 50
+  sms-cost: 50
 
 api:
   encryption-password: 12345

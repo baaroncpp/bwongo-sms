@@ -1,9 +1,9 @@
 package com.bwongo.core.merchant_mgt.api;
 
 import com.bwongo.core.base.model.dto.response.PageResponseDto;
-import com.bwongo.core.merchant_mgt.models.dto.request.MerchantRequestDto;
-import com.bwongo.core.merchant_mgt.models.dto.request.MerchantUpdateRequestDto;
+import com.bwongo.core.merchant_mgt.models.dto.request.*;
 import com.bwongo.core.merchant_mgt.models.dto.response.MerchantResponseDto;
+import com.bwongo.core.merchant_mgt.models.dto.response.MerchantSmsSettingResponseDto;
 import com.bwongo.core.merchant_mgt.service.MerchantService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -75,5 +75,23 @@ public class MerchantApi {
     @GetMapping(path = "{id}/activate")
     public MerchantResponseDto activateMerchantByAdmin(@PathVariable("id") Long id){
         return merchantService.activateMerchantByAdmin(id);
+    }
+
+    @PreAuthorize("hasAnyAuthority('MERCHANT_ROLE.WRITE','ADMIN_ROLE.WRITE')")
+    @PostMapping(path = "sms-setting", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
+    public MerchantSmsSettingResponseDto addSmsSetting(@RequestBody MerchantSmsSettingRequestDto merchantSmsSettingRequestDto){
+        return merchantService.addMerchantSmsSetting(merchantSmsSettingRequestDto);
+    }
+
+    @PreAuthorize("hasAnyAuthority('MERCHANT_ROLE.WRITE','ADMIN_ROLE.UPDATE')")
+    @PutMapping(path = "sms-setting", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
+    public MerchantSmsSettingResponseDto updateSmsSetting(@RequestBody MerchantSmsSettingUpdateRequestDto merchantSmsSettingUpdateRequestDto){
+        return merchantService.updateMerchantSmsSetting(merchantSmsSettingUpdateRequestDto);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN_ROLE.UPDATE')")
+    @PutMapping(path = "customize/sms-cost", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
+    public MerchantSmsSettingResponseDto addCustomSms(@RequestBody CustomSmsCostRequestDto customSmsCostRequestDto){
+        return merchantService.setCustomSmsCost(customSmsCostRequestDto);
     }
 }

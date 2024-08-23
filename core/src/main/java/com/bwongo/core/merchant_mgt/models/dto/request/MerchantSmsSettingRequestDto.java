@@ -15,15 +15,15 @@ import static com.bwongo.core.merchant_mgt.utils.MerchantMsgConstants.*;
  **/
 public record MerchantSmsSettingRequestDto(
         Long merchantId,
-        BigDecimal smsCost,
+        //BigDecimal smsCost,
         boolean isCustomized,
         String customizedTitle
 ) {
     public void validate(){
         Validate.notNull(merchantId, ExceptionType.BAD_REQUEST, MERCHANT_ID_REQUIRED);
-        Validate.notNull(smsCost, ExceptionType.BAD_REQUEST, SMS_COST_REQUIRED);
+        //Validate.notNull(smsCost, ExceptionType.BAD_REQUEST, SMS_COST_REQUIRED);
         Validate.notNull(isCustomized, ExceptionType.BAD_REQUEST, IS_CUSTOMIZED_REQUIRED);
-        Validate.isTrue((smsCost.compareTo(BigDecimal.ZERO) > 0), ExceptionType.BAD_REQUEST, SMS_COST_MUST_BE_GREATER_THAN_ZERO);
+        //Validate.isTrue((smsCost.compareTo(BigDecimal.ZERO) > 0), ExceptionType.BAD_REQUEST, SMS_COST_MUST_BE_GREATER_THAN_ZERO);
 
         if(isCustomized)
             Validate.notEmpty(customizedTitle, CUSTOMIZED_TITLE_REQUIRED);

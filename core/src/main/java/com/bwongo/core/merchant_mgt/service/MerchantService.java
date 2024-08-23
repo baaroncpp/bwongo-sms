@@ -10,14 +10,13 @@ import com.bwongo.core.base.repository.TAddressRepository;
 import com.bwongo.core.base.repository.TCountryRepository;
 import com.bwongo.core.base.service.AuditService;
 import com.bwongo.core.base.service.BaseService;
-import com.bwongo.core.merchant_mgt.models.dto.request.MerchantRequestDto;
-import com.bwongo.core.merchant_mgt.models.dto.request.MerchantSmsSettingRequestDto;
-import com.bwongo.core.merchant_mgt.models.dto.request.MerchantSmsSettingUpdateRequestDto;
-import com.bwongo.core.merchant_mgt.models.dto.request.MerchantUpdateRequestDto;
+import com.bwongo.core.merchant_mgt.models.dto.request.*;
+import com.bwongo.core.merchant_mgt.models.dto.response.MerchantApiSettingResponseDto;
 import com.bwongo.core.merchant_mgt.models.dto.response.MerchantResponseDto;
 import com.bwongo.core.merchant_mgt.models.dto.response.MerchantSmsSettingResponseDto;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchantActivation;
+import com.bwongo.core.merchant_mgt.models.jpa.TMerchantApiSetting;
 import com.bwongo.core.merchant_mgt.repository.TMerchantActivationRepository;
 import com.bwongo.core.merchant_mgt.repository.TMerchantRepository;
 import com.bwongo.core.merchant_mgt.repository.TMerchantSmsSettingRepository;
@@ -32,6 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 import static com.bwongo.commons.text.StringUtil.getRandom6DigitString;
 import static com.bwongo.commons.utils.DateTimeUtil.getCurrentUTCTime;
@@ -61,9 +62,13 @@ public class MerchantService {
     private final TAddressRepository addressRepository;
     private final TMerchantActivationRepository merchantActivationRepository;
     private final TUserGroupRepository userGroupRepository;
+    private final TMerchantSmsSettingRepository merchantSmsSettingsRepository;
 
     @Value("${sms.max-number-characters}")
     private int smsMaxNumberOfCharacters;
+
+    @Value("${sms.sms-cost}")
+    private BigDecimal smsCost;
 
     @Transactional
     public MerchantResponseDto addMerchant(MerchantRequestDto merchantRequestDto){
@@ -246,7 +251,7 @@ public class MerchantService {
         return merchantDtoService.merchantToDto(activatedMerchant);
     }
 
-    public MerchantSmsSettingResponseDto addMerchantSmsConfiguration(MerchantSmsSettingRequestDto merchantSmsSettingRequestDto){
+    public MerchantSmsSettingResponseDto addMerchantSmsSetting(MerchantSmsSettingRequestDto merchantSmsSettingRequestDto){
 
         merchantSmsSettingRequestDto.validate();
         var merchantId = merchantSmsSettingRequestDto.merchantId();
@@ -258,6 +263,7 @@ public class MerchantService {
         var merchantSmsSetting = merchantDtoService.dtoToMerchantSmsSetting(merchantSmsSettingRequestDto);
         merchantSmsSetting.setMaxNumberOfCharactersPerSms(smsMaxNumberOfCharacters);
         merchantSmsSetting.setMerchant(merchant);
+        merchantSmsSetting.setSmsCost(smsCost);
         auditService.stampLongEntity(merchantSmsSetting);
 
         var savedMerchantSmsSetting = merchantSmsSettingRepository.save(merchantSmsSetting);
@@ -265,7 +271,7 @@ public class MerchantService {
         return merchantDtoService.merchantSmsSettingToDto(savedMerchantSmsSetting);
     }
 
-    public MerchantSmsSettingResponseDto updateMerchantSmsConfiguration(MerchantSmsSettingUpdateRequestDto merchantSmsSettingUpdateRequestDto){
+    public MerchantSmsSettingResponseDto updateMerchantSmsSetting(MerchantSmsSettingUpdateRequestDto merchantSmsSettingUpdateRequestDto){
 
         merchantSmsSettingUpdateRequestDto.validate();
         var smsSettingId = merchantSmsSettingUpdateRequestDto.id();
@@ -274,12 +280,26 @@ public class MerchantService {
         Validate.isPresent(existingMerchantSmsSetting, MERCHANT_SMS_SETTING_NOT_FOUND, smsSettingId);
         var smsSetting = existingMerchantSmsSetting.get();
 
-        smsSetting.setSmsCost(merchantSmsSettingUpdateRequestDto.smsCost());
+        //smsSetting.setSmsCost(merchantSmsSettingUpdateRequestDto.smsCost());
         smsSetting.setCustomized(merchantSmsSettingUpdateRequestDto.isCustomized());
         smsSetting.setCustomizedTitle(merchantSmsSettingUpdateRequestDto.customizedTitle());
+        smsSetting.setSmsCost(smsCost);
         auditService.stampLongEntity(smsSetting);
 
         return merchantDtoService.merchantSmsSettingToDto(merchantSmsSettingRepository.save(smsSetting));
+    }
+
+    public MerchantSmsSettingResponseDto setCustomSmsCost(CustomSmsCostRequestDto customSmsCostRequestDto){
+
+        customSmsCostRequestDto.validate();
+        var merchant = getMerchantById(customSmsCostRequestDto.merchantId());
+        var existingMerchantSmsSetting = merchantSmsSettingRepository.findByMerchant(merchant);
+        var merchantSmsSetting = existingMerchantSmsSetting.get();
+
+        merchantSmsSetting.setSmsCost(customSmsCostRequestDto.smsCost());
+        auditService.stampLongEntity(merchantSmsSetting);
+
+        return merchantDtoService.merchantSmsSettingToDto(merchantSmsSettingRepository.save(merchantSmsSetting));
     }
 
     @Transactional
@@ -331,6 +351,10 @@ public class MerchantService {
         var existingMerchant = merchantRepository.findById(id);
         Validate.isPresent(existingMerchant, MERCHANT_NOT_FOUND, id);
         return existingMerchant.get();
+    }
+
+    private TMerchant getLoggedInUserMerchant(){
+        return getMerchantById(getLoggedInUser().getId());
     }
 
     private TUser getLoggedInUser(){

@@ -92,7 +92,7 @@ public class MerchantDtoService {
         var customizedTitle = merchantSmsSettingRequestDto.isCustomized() ? merchantSmsSettingRequestDto.customizedTitle() : defaultTitle;
 
         return TMerchantSmsSetting.builder()
-                .smsCost(merchantSmsSettingRequestDto.smsCost())
+                //.smsCost(merchantSmsSettingRequestDto.smsCost())
                 .isCustomized(merchantSmsSettingRequestDto.isCustomized())
                 .customizedTitle(customizedTitle)
                 .build();

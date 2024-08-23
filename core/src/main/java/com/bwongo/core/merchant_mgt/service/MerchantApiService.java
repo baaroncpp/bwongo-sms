@@ -41,7 +41,7 @@ public class MerchantApiService {
     private final TUserRepository userRepository;
     private final TMerchantRepository merchantRepository;
 
-    public MerchantApiSettingResponseDto getMerchantApiSetting(MerchantApiSettingRequestDto merchantApiSettingRequestDto) {
+    public MerchantApiSettingResponseDto createMerchantApiSetting(MerchantApiSettingRequestDto merchantApiSettingRequestDto) {
 
         merchantApiSettingRequestDto.validate();
         var merchant = getLoggedInUserMerchant();
