@@ -42,3 +42,12 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+bootJar {
+	archiveFileName = 'integration-service.jar'
+}
+
+jar {
+	archiveBaseName = 'integration-service'
+	archiveVersion = '1.0.0'
+}

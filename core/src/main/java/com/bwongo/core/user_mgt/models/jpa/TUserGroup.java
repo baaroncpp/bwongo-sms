@@ -4,6 +4,9 @@ import com.bwongo.core.base.model.jpa.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 /**
  * @Author bkaaron
@@ -11,6 +14,9 @@ import jakarta.persistence.Table;
  * @Date 3/10/24
  * @LocalTime 5:17 PM
  **/
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "t_user_group", schema = "core")
 public class TUserGroup extends BaseEntity {

@@ -31,7 +31,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the built jar file from the build stage
-COPY --from=build /app/build/libs/notification-service.jar app.jar
+COPY --from=build /app/build/libs/integration-service.jar app.jar
 
 # Expose the application port
 EXPOSE 2028

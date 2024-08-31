@@ -5,6 +5,7 @@ import com.bwongo.commons.utils.Validate;
 import com.bwongo.core.base.model.dto.response.PageResponseDto;
 import com.bwongo.core.base.model.enums.ActivationCodeStatusEnum;
 import com.bwongo.core.base.model.enums.MerchantStatusEnum;
+import com.bwongo.core.base.model.enums.MerchantTypeEnum;
 import com.bwongo.core.base.model.enums.UserTypeEnum;
 import com.bwongo.core.base.repository.TAddressRepository;
 import com.bwongo.core.base.repository.TCountryRepository;
@@ -92,6 +93,8 @@ public class MerchantService {
         merchant.setMerchantCode(merchantCode);
         merchant.setCountry(country);
         merchant.setNonVerifiedPhoneNumber(Boolean.FALSE);
+        merchant.setMerchantStatus(MerchantStatusEnum.INACTIVE);
+        //merchant.setMerchantType(MerchantTypeEnum.PERSONAL);
         auditService.stampAuditedEntity(merchant);
         var savedMerchant = merchantRepository.save(merchant);
 
@@ -106,6 +109,7 @@ public class MerchantService {
         user.setMerchantId(savedMerchant.getId());
         user.setUserType(UserTypeEnum.MERCHANT);
         user.setUserGroup(getUserGroupByName(MERCHANT_GROUP));
+        user.setNonVerifiedEmail(Boolean.TRUE);
         auditService.stampLongEntity(user);
 
         userRepository.save(user);
@@ -308,7 +312,7 @@ public class MerchantService {
         Validate.isTrue(!merchant.isActive(), ExceptionType.BAD_REQUEST, MERCHANT_ALREADY_ACTIVATED, merchant.getId());
 
         var merchantActivations = merchantActivationRepository.findAllByMerchantAndActivationCodeStatus(merchant, ActivationCodeStatusEnum.FAILED);
-        Validate.isTrue(merchantActivations.size() >= 3, ExceptionType.BAD_REQUEST, CONTACT_ADMIN_MAX_FAILS);
+        Validate.isTrue(merchantActivations.size() < 3, ExceptionType.BAD_REQUEST, CONTACT_ADMIN_MAX_FAILS);
 
         var activationCode = generateMerchantCode();
         var isResend = merchantActivations.isEmpty() ? Boolean.FALSE : Boolean.TRUE;

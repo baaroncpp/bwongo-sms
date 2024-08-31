@@ -76,7 +76,7 @@ public class TUser extends BaseEntity {
     }
 
     @JoinColumn(name = "user_group_id", referencedColumnName = "id", insertable = true, updatable = false)
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     public TUserGroup getUserGroup() {
         return userGroup;
     }

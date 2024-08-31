@@ -34,13 +34,13 @@ services:
       - kafka
 
 
-  core:
-    build:
-      context: ./core
-      dockerfile: Dockerfile
-    container_name: core-service
-    ports:
-      - "2024:2024"
+#  core:
+#    build:
+#      context: ./core
+#      dockerfile: Dockerfile
+#    container_name: core-service
+#    ports:
+#      - "2024:2024"
 
 #  notification:
 #    build:

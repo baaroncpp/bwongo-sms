@@ -1,0 +1,5 @@
+server:
+  port: 2028
+spring:
+  application:
+    name: sms-integration-service
