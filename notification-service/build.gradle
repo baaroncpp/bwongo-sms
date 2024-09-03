@@ -43,15 +43,15 @@ dependencies {
 	implementation project(':commons')
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
-}
-
 bootJar {
-	archiveFileName = 'notification-service.jar'
+	archiveFileName = 'notificationService.jar'
 }
 
 jar {
-	archiveBaseName = 'notification-service'
+	archiveBaseName = 'notificationService'
 	archiveVersion = '1.0.0'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
 }

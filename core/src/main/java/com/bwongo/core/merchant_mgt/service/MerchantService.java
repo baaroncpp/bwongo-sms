@@ -1,5 +1,6 @@
 package com.bwongo.core.merchant_mgt.service;
 
+import com.bwongo.commons.exceptions.ResourceNotFoundException;
 import com.bwongo.commons.exceptions.model.ExceptionType;
 import com.bwongo.commons.utils.Validate;
 import com.bwongo.core.base.model.dto.response.PageResponseDto;
@@ -34,6 +35,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.bwongo.commons.text.StringUtil.getRandom6DigitString;
 import static com.bwongo.commons.utils.DateTimeUtil.getCurrentUTCTime;
