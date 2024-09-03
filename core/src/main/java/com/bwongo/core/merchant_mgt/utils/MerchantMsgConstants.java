@@ -32,4 +32,5 @@ public class MerchantMsgConstants {
     public static final String MERCHANT_INVALID_USER_TYPE = "Invalid merchant user type: %s, use MERCHANT";
     public static final String MERCHANT_GROUP = "MERCHANT_GROUP";
     public static final String NOT_MERCHANT_USER = "Not a merchant user";
+    public static final String MERCHANT_IS_INACTIVE = "Merchant is inactive";
 }

@@ -14,5 +14,8 @@ public class AccountMsgUtils {
     public static final String NULL_MSISDN = "msisdn is required";
     public static final String NULL_DEPOSIT_AMOUNT = "depositAmount is required";
     public static final String AMOUNT_MUST_BE_GREATER_THAN_ZERO = "amount must be greater than zero";
+    public static final String ACCOUNT_ERROR = "account is %s";
+    public static final String ACCOUNT_DELETED = "account is deleted";
+    public static final String INSUFFICIENT_FUNDS = "insufficient funds";
 
 }
