@@ -3,6 +3,9 @@ package com.bwongo.core.account_mgt.models.jpa;
 import com.bwongo.core.base.model.enums.CashFlowEnum;
 import com.bwongo.core.base.model.jpa.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -13,6 +16,9 @@ import java.math.BigDecimal;
  * @Date 8/19/24
  * @LocalTime 2:20 PM
  **/
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Setter
 @Entity
 @Table(name = "t_cash_flow",schema = "core")

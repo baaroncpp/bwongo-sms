@@ -14,4 +14,7 @@ public class SmsMsgConstants {
     public static final String NULL_SENDER = "sender is required";
     public static final String NULL_PHONE_NUMBER = "phoneNumber is required";
     public static final String EMPTY_SMS_REQUEST_LIST = "empty sms request list";
+    public static final String SMS_NOT_FOUND = "sms : %s not found";
+    public static final String SMS_ALREADY_DELIVERED = "sms already delivered";
+    public static final String PENDING_DELIVERY = "pending delivery";
 }

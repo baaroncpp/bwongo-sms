@@ -16,4 +16,5 @@ import java.util.Optional;
 @Repository
 public interface TAccountRepository extends JpaRepository<TAccount, Long> {
     Optional<TAccount> findByMerchant(TMerchant merchant);
+    Optional<TAccount> findByCode(String code);
 }

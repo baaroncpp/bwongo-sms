@@ -1,24 +1,20 @@
 package com.bwongo.core.merchant_mgt.service;
 
-import com.bwongo.commons.exceptions.ResourceNotFoundException;
 import com.bwongo.commons.exceptions.model.ExceptionType;
 import com.bwongo.commons.utils.Validate;
 import com.bwongo.core.base.model.dto.response.PageResponseDto;
 import com.bwongo.core.base.model.enums.ActivationCodeStatusEnum;
 import com.bwongo.core.base.model.enums.MerchantStatusEnum;
-import com.bwongo.core.base.model.enums.MerchantTypeEnum;
 import com.bwongo.core.base.model.enums.UserTypeEnum;
 import com.bwongo.core.base.repository.TAddressRepository;
 import com.bwongo.core.base.repository.TCountryRepository;
 import com.bwongo.core.base.service.AuditService;
 import com.bwongo.core.base.service.BaseService;
 import com.bwongo.core.merchant_mgt.models.dto.request.*;
-import com.bwongo.core.merchant_mgt.models.dto.response.MerchantApiSettingResponseDto;
 import com.bwongo.core.merchant_mgt.models.dto.response.MerchantResponseDto;
 import com.bwongo.core.merchant_mgt.models.dto.response.MerchantSmsSettingResponseDto;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchantActivation;
-import com.bwongo.core.merchant_mgt.models.jpa.TMerchantApiSetting;
 import com.bwongo.core.merchant_mgt.repository.TMerchantActivationRepository;
 import com.bwongo.core.merchant_mgt.repository.TMerchantRepository;
 import com.bwongo.core.merchant_mgt.repository.TMerchantSmsSettingRepository;
@@ -27,7 +23,7 @@ import com.bwongo.core.user_mgt.models.jpa.TUser;
 import com.bwongo.core.user_mgt.models.jpa.TUserGroup;
 import com.bwongo.core.user_mgt.repository.TUserGroupRepository;
 import com.bwongo.core.user_mgt.repository.TUserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,8 +31,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static com.bwongo.commons.text.StringUtil.getRandom6DigitString;
 import static com.bwongo.commons.utils.DateTimeUtil.getCurrentUTCTime;

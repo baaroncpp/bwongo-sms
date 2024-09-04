@@ -16,7 +16,7 @@ import com.bwongo.core.user_mgt.models.jpa.TUser;
 import com.bwongo.core.user_mgt.models.jpa.TUserApproval;
 import com.bwongo.core.user_mgt.repository.*;
 import com.bwongo.core.user_mgt.service.dto.UserDtoService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;

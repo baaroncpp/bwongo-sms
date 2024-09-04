@@ -30,6 +30,7 @@ public class TSms extends AuditEntity {
     private int resendCount;
     private TMerchant merchant;
     private String internalReference;
+    private String externalReference;
 
     @Column(name = "phone_number")
     public String getPhoneNumber() {
@@ -71,5 +72,10 @@ public class TSms extends AuditEntity {
     @Column(name = "internal_reference")
     public String getInternalReference() {
         return internalReference;
+    }
+
+    @Column(name = "external_reference")
+    public String getExternalReference() {
+        return externalReference;
     }
 }
