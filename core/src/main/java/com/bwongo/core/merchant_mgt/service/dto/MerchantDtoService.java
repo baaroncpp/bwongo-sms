@@ -1,6 +1,7 @@
 package com.bwongo.core.merchant_mgt.service.dto;
 
 import com.bwongo.core.base.model.enums.MerchantTypeEnum;
+import com.bwongo.core.base.model.enums.PaymentTypeEnum;
 import com.bwongo.core.base.service.dto.BaseDtoService;
 import com.bwongo.core.merchant_mgt.models.dto.request.MerchantRequestDto;
 import com.bwongo.core.merchant_mgt.models.dto.request.MerchantSmsSettingRequestDto;
@@ -95,6 +96,7 @@ public class MerchantDtoService {
                 //.smsCost(merchantSmsSettingRequestDto.smsCost())
                 .isCustomized(merchantSmsSettingRequestDto.isCustomized())
                 .customizedTitle(customizedTitle)
+                .paymentType(PaymentTypeEnum.valueOf(merchantSmsSettingRequestDto.paymentType()))
                 .build();
     }
 
@@ -113,7 +115,8 @@ public class MerchantDtoService {
                 merchantToDto(merchantSmsSetting.getMerchant()),
                 merchantSmsSetting.getSmsCost(),
                 merchantSmsSetting.getMaxNumberOfCharactersPerSms(),
-                merchantSmsSetting.isCustomized()
+                merchantSmsSetting.isCustomized(),
+                merchantSmsSetting.getPaymentType()
         );
     }
 

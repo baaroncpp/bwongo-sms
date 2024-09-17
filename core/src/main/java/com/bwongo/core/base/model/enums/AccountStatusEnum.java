@@ -7,5 +7,5 @@ package com.bwongo.core.base.model.enums;
  * @LocalTime 9:52 PM
  **/
 public enum AccountStatusEnum {
-    ACTIVE, SUSPENDED, DEACTIVATED, CLOSED
+    ACTIVE, SUSPENDED, DEACTIVATED, CLOSED, PENDING
 }

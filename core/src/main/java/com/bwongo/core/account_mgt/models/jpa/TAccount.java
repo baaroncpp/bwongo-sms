@@ -1,11 +1,15 @@
 package com.bwongo.core.account_mgt.models.jpa;
 
+import com.bwongo.core.base.model.enums.AccountCategoryEnum;
 import com.bwongo.core.base.model.enums.AccountStatusEnum;
 import com.bwongo.core.base.model.enums.AccountTypeEnum;
 import com.bwongo.core.base.model.jpa.AuditEntity;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
 import com.bwongo.core.user_mgt.models.jpa.TUser;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -17,6 +21,9 @@ import java.util.Date;
  * @Date 8/19/24
  * @LocalTime 12:55 PM
  **/
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Setter
 @Table(name = "t_account", schema = "core")
@@ -27,6 +34,7 @@ public class TAccount extends AuditEntity {
     private TMerchant merchant;
     private BigDecimal currentBalance;
     private AccountTypeEnum accountType;
+    private AccountCategoryEnum accountCategory;
     private BigDecimal balanceToNotifyAt;
     private Date balanceNotificationSentOn;
     private Date activateOn;
@@ -47,6 +55,7 @@ public class TAccount extends AuditEntity {
     }
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     public AccountStatusEnum getStatus() {
         return status;
     }
@@ -63,6 +72,7 @@ public class TAccount extends AuditEntity {
     }
 
     @Column(name = "account_type")
+    @Enumerated(EnumType.STRING)
     public AccountTypeEnum getAccountType() {
         return accountType;
     }
@@ -108,5 +118,11 @@ public class TAccount extends AuditEntity {
     @OneToOne(fetch = FetchType.LAZY)
     public TUser getClosedBy() {
         return closedBy;
+    }
+
+    @Column(name = "account_category")
+    @Enumerated(EnumType.STRING)
+    public AccountCategoryEnum getAccountCategory() {
+        return accountCategory;
     }
 }

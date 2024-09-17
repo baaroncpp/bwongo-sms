@@ -11,6 +11,8 @@ CREATE TABLE t_account
     status VARCHAR(20) NOT NULL,
     merchant_id BIGINT REFERENCES t_merchant(id),
     current_balance NUMERIC(19, 4),
+    account_type VARCHAR(150),
+    account_category VARCHAR(150),
     balance_to_notify_at NUMERIC(19, 4),
     balance_notification_sent_on TIMESTAMP,
     activated_on TIMESTAMP,

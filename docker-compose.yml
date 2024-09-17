@@ -35,8 +35,9 @@ services:
 
   core:
     build:
-      context: ./core
-      dockerfile: Dockerfile
+#      context: ./core
+#      dockerfile: Dockerfile
+      dockerfile: Dockerfile.core
     container_name: core-service
     ports:
       - "2024:2024"
@@ -45,8 +46,9 @@ services:
 
   notification:
     build:
-      context: ./notification-service
-      dockerfile: Dockerfile
+#      context: ./notification-service
+#      dockerfile: Dockerfile
+      dockerfile: Dockerfile.notify
     container_name: notification-service
     ports:
       - "2028:2028"

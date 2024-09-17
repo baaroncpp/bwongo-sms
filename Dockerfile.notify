@@ -1,0 +1,41 @@
+# Use the official Gradle image to build the app
+FROM gradle:7.4.2-jdk17 AS build
+
+LABEL maintainer="BkAaron <baaronlubega1@gmail.com>"
+
+# Set the working directory
+WORKDIR /app
+
+# Copy Gradle wrapper and settings files first
+COPY notification-service/gradle /app/notification-service/gradle
+COPY notification-service/gradlew /app/notification-service/gradlew
+COPY notification-service/settings.gradle /app/notification-service/settings.gradle
+COPY notification-service/build.gradle /app/notification-service/build.gradle
+COPY commons /app/commons
+
+# Ensure gradlew has executable permissions
+RUN chmod +x ./notification-service/gradlew
+
+# Download dependencies
+RUN ./notification-service/gradlew build -x test --no-daemon --info --stacktrace || true
+
+# Copy the project files
+COPY notification-service . .
+
+# Build the project
+RUN ./notification-service/gradlew build --no-daemon
+
+# Use the official OpenJDK image for the runtime
+FROM openjdk:17-jdk-slim
+
+# Set the working directory
+WORKDIR /app/notification-service
+
+# Copy the built jar file from the build stage
+COPY --from=build /app/notification-service/build/libs/notificationService.jar app.jar
+
+# Expose the application port
+EXPOSE 2028
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]

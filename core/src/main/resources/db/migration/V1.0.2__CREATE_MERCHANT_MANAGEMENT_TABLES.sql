@@ -56,5 +56,6 @@ CREATE TABLE t_merchant_sms_setting(
     merchant_id BIGINT NOT NULL REFERENCES t_merchant(id),
     sms_cost NUMERIC NOT NULL,
     max_number_of_characters_per_sms INTEGER NOT NULL,
-    is_customized BOOLEAN DEFAULT FALSE
+    is_customized BOOLEAN DEFAULT FALSE,
+    payment_type VARCHAR(150)
 );

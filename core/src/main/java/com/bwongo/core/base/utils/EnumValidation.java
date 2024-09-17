@@ -111,4 +111,12 @@ public class EnumValidation {
         );
         return merchantTypeEnumList.contains(value);
     }
+
+    public static boolean isPaymentTypeEnum(String value){
+        var paymentTypeEnumList = Arrays.asList(
+                PaymentTypeEnum.POSTPAID.name(),
+                PaymentTypeEnum.PREPAID.name()
+        );
+        return paymentTypeEnumList.contains(value);
+    }
 }

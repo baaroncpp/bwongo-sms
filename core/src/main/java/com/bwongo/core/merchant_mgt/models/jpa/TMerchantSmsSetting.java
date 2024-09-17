@@ -1,5 +1,6 @@
 package com.bwongo.core.merchant_mgt.models.jpa;
 
+import com.bwongo.core.base.model.enums.PaymentTypeEnum;
 import com.bwongo.core.base.model.jpa.AuditEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,7 @@ public class TMerchantSmsSetting extends AuditEntity {
     private BigDecimal smsCost;
     private int maxNumberOfCharactersPerSms;
     private boolean isCustomized;
+    private PaymentTypeEnum paymentType;
 
     @Column(name = "customized_title")
     public String getCustomizedTitle() {
@@ -53,5 +55,11 @@ public class TMerchantSmsSetting extends AuditEntity {
     @Column(name = "is_customized")
     public boolean isCustomized() {
         return isCustomized;
+    }
+
+    @Column(name = "payment_type")
+    @Enumerated(EnumType.STRING)
+    public PaymentTypeEnum getPaymentType() {
+        return paymentType;
     }
 }

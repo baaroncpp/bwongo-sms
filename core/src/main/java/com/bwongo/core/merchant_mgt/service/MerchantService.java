@@ -2,10 +2,10 @@ package com.bwongo.core.merchant_mgt.service;
 
 import com.bwongo.commons.exceptions.model.ExceptionType;
 import com.bwongo.commons.utils.Validate;
+import com.bwongo.core.account_mgt.models.jpa.TAccount;
+import com.bwongo.core.account_mgt.repository.TAccountRepository;
 import com.bwongo.core.base.model.dto.response.PageResponseDto;
-import com.bwongo.core.base.model.enums.ActivationCodeStatusEnum;
-import com.bwongo.core.base.model.enums.MerchantStatusEnum;
-import com.bwongo.core.base.model.enums.UserTypeEnum;
+import com.bwongo.core.base.model.enums.*;
 import com.bwongo.core.base.repository.TAddressRepository;
 import com.bwongo.core.base.repository.TCountryRepository;
 import com.bwongo.core.base.service.AuditService;
@@ -15,6 +15,7 @@ import com.bwongo.core.merchant_mgt.models.dto.response.MerchantResponseDto;
 import com.bwongo.core.merchant_mgt.models.dto.response.MerchantSmsSettingResponseDto;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchantActivation;
+import com.bwongo.core.merchant_mgt.models.jpa.TMerchantSmsSetting;
 import com.bwongo.core.merchant_mgt.repository.TMerchantActivationRepository;
 import com.bwongo.core.merchant_mgt.repository.TMerchantRepository;
 import com.bwongo.core.merchant_mgt.repository.TMerchantSmsSettingRepository;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 
 import static com.bwongo.commons.text.StringUtil.getRandom6DigitString;
+import static com.bwongo.commons.text.StringUtil.getRandom8DigitString;
 import static com.bwongo.commons.utils.DateTimeUtil.getCurrentUTCTime;
 import static com.bwongo.core.base.utils.BaseMsgUtils.*;
 import static com.bwongo.core.base.utils.BaseUtils.pageToDto;
@@ -61,6 +63,7 @@ public class MerchantService {
     private final TMerchantActivationRepository merchantActivationRepository;
     private final TUserGroupRepository userGroupRepository;
     private final TMerchantSmsSettingRepository merchantSmsSettingsRepository;
+    private final TAccountRepository accountRepository;
 
     @Value("${sms.max-number-characters}")
     private int smsMaxNumberOfCharacters;
@@ -252,6 +255,7 @@ public class MerchantService {
         return merchantDtoService.merchantToDto(activatedMerchant);
     }
 
+    @Transactional
     public MerchantSmsSettingResponseDto addMerchantSmsSetting(MerchantSmsSettingRequestDto merchantSmsSettingRequestDto){
 
         merchantSmsSettingRequestDto.validate();
@@ -268,6 +272,9 @@ public class MerchantService {
         auditService.stampLongEntity(merchantSmsSetting);
 
         var savedMerchantSmsSetting = merchantSmsSettingRepository.save(merchantSmsSetting);
+
+        //CREATE MERCHANT ACCOUNTS
+        createMerchantAccounts(savedMerchantSmsSetting);
 
         return merchantDtoService.merchantSmsSettingToDto(savedMerchantSmsSetting);
     }
@@ -328,14 +335,6 @@ public class MerchantService {
         //TODO SEND TO KAFKA THE ACTIVATION CODE
     }
 
-    private String generateMerchantCode(){
-        var code = "";
-        do{
-            code = getRandom6DigitString();
-        }while(merchantActivationRepository.findByActivationCode(code).isPresent());
-        return code;
-    }
-
     public void invalidateExpiredActivationCodes(){
         var merchantActivations = merchantActivationRepository.findAllByCreatedOnBeforeAndActive(getCurrentUTCTime(), Boolean.TRUE);
 
@@ -346,6 +345,49 @@ public class MerchantService {
             auditService.stampLongEntity(activation);
             merchantActivationRepository.save(activation);
         });
+    }
+
+    private void createMerchantAccounts(TMerchantSmsSetting merchantSmsSetting){
+        var merchant = merchantSmsSetting.getMerchant();
+        var accountType = merchantSmsSetting.getPaymentType();
+
+        createMerchantAccount(merchant, AccountTypeEnum.DEBIT);
+
+        if (accountType.name().equals(AccountTypeEnum.CREDIT.name()))
+            createMerchantAccount(merchant, AccountTypeEnum.CREDIT);
+    }
+
+    private void createMerchantAccount(TMerchant merchant, AccountTypeEnum accountType){
+
+        var account = TAccount.builder()
+                .name(merchant.getMerchantName())
+                .code(generateAccountCode())
+                .status(AccountStatusEnum.PENDING)
+                .merchant(merchant)
+                .currentBalance(BigDecimal.ZERO)
+                .accountType(accountType)
+                .accountCategory(AccountCategoryEnum.MERCHANT)
+                .balanceToNotifyAt(BigDecimal.valueOf(1000))
+                .build();
+
+        auditService.stampAuditedEntity(account);
+        accountRepository.save(account);
+    }
+
+    private String generateAccountCode(){
+        var code = "";
+        do{
+            code = getRandom8DigitString();
+        }while(accountRepository.findByCode(code).isPresent());
+        return code;
+    }
+
+    private String generateMerchantCode(){
+        var code = "";
+        do{
+            code = getRandom6DigitString();
+        }while(merchantActivationRepository.findByActivationCode(code).isPresent());
+        return code;
     }
 
     private TMerchant getMerchantById(Long id){

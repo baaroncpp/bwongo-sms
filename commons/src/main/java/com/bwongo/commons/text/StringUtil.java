@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 /**
@@ -217,5 +218,11 @@ public class StringUtil {
     public static String getRandom6DigitString(){
         var rnd = new Random();
         return String.valueOf(100000 +rnd.nextInt(900000));
+    }
+
+    public static String getRandom8DigitString(){
+        return ThreadLocalRandom.current()
+                .ints(8, 0, 10) // Generates 8 random integers in the range 0-9
+                .mapToObj(Integer::toString).reduce("", String::concat);
     }
 }

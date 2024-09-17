@@ -7,5 +7,5 @@ package com.bwongo.core.base.model.enums;
  * @LocalTime 3:50 PM
  **/
 public enum AccountCategoryEnum {
-    SAVINGS, SACCO_MAIN, SACCO_PRODUCT, MOMO, BANK, CASH, SHARE
+    SYSTEM, MERCHANT
 }

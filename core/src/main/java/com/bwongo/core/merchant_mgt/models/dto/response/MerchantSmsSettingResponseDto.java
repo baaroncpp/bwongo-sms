@@ -1,5 +1,6 @@
 package com.bwongo.core.merchant_mgt.models.dto.response;
 
+import com.bwongo.core.base.model.enums.PaymentTypeEnum;
 import com.bwongo.core.user_mgt.models.dto.response.UserResponseDto;
 
 import java.math.BigDecimal;
@@ -22,6 +23,7 @@ public record MerchantSmsSettingResponseDto(
         MerchantResponseDto merchant,
         BigDecimal smsCost,
         int maxNumberOfCharactersPerSms,
-        boolean isCustomized
+        boolean isCustomized,
+        PaymentTypeEnum paymentType
 ) {
 }
