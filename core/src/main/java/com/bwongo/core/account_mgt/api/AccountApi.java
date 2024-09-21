@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import static com.bwongo.core.base.utils.BaseMsgUtils.CREATED_ON;
 import static io.netty.handler.codec.http.HttpHeaders.Values.APPLICATION_JSON;
 
 /**
@@ -39,7 +40,7 @@ public class AccountApi {
     public PageResponseDto getMerchantMomoDeposits(@PathVariable("id") Long merchantId,
                                                    @RequestParam(name = "page") int page,
                                                    @RequestParam(name = "size") int size){
-        var pageable = PageRequest.of(page, size, Sort.by("createdOn").descending());
+        var pageable = PageRequest.of(page, size, Sort.by(CREATED_ON).descending());
         return accountService.getMerchantMomoDeposits(merchantId, pageable);
     }
 
@@ -54,9 +55,9 @@ public class AccountApi {
     @PreAuthorize("hasAnyAuthority('MERCHANT_ROLE.READ', 'ADMIN_ROLE.READ')")
     @GetMapping(path = "transactions/merchant/{id}", produces = APPLICATION_JSON)
     public PageResponseDto getMerchantTransactions(@PathVariable("id") Long merchantId,
-                                           @RequestParam(name = "page") int page,
-                                           @RequestParam(name = "size") int size){
-        var pageable = PageRequest.of(page, size, Sort.by("createdOn").descending());
+                                                   @RequestParam(name = "page") int page,
+                                                   @RequestParam(name = "size") int size){
+        var pageable = PageRequest.of(page, size, Sort.by(CREATED_ON).descending());
         return accountService.getMerchantTransactions(merchantId, pageable);
     }
 
@@ -64,7 +65,7 @@ public class AccountApi {
     @GetMapping(path = "transactions", produces = APPLICATION_JSON)
     public PageResponseDto getTransactions(@RequestParam(name = "page") int page,
                                            @RequestParam(name = "size") int size){
-        var pageable = PageRequest.of(page, size, Sort.by("createdOn").descending());
+        var pageable = PageRequest.of(page, size, Sort.by(CREATED_ON).descending());
         return accountService.getAccountTransactions(pageable);
     }
 
@@ -78,7 +79,7 @@ public class AccountApi {
     @GetMapping(path = "all", produces = APPLICATION_JSON)
     public PageResponseDto getAccounts(@RequestParam(name = "page") int page,
                                        @RequestParam(name = "size") int size){
-        var pageable = PageRequest.of(page, size, Sort.by("createdOn").descending());
+        var pageable = PageRequest.of(page, size, Sort.by(CREATED_ON).descending());
         return accountService.getAccounts(pageable);
     }
 }

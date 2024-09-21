@@ -3,9 +3,9 @@ package com.bwongo.core.base.model.enums;
 /**
  * @Author bkaaron
  * @Project bwongo-sms
- * @Date 9/18/24
- * @Time 12:28AM
+ * @Date 9/21/24
+ * @Time 12:04 AM
  **/
-public enum PaymentTypeEnum {
-    PREPAID, POSTPAID
+public enum PaymentStatusEnum {
+    PAID, NOT_PAID
 }

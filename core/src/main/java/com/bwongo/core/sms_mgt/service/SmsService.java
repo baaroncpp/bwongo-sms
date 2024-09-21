@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
+import static com.bwongo.core.account_mgt.utils.AccountMsgUtils.NOT_CREDIT_ACCOUNT;
 import static com.bwongo.core.account_mgt.utils.AccountUtils.checkIfAccountIsValid;
 import static com.bwongo.core.merchant_mgt.utils.MerchantMsgConstants.MERCHANT_NOT_FOUND;
 import static com.bwongo.core.merchant_mgt.utils.MerchantMsgConstants.MERCHANT_SMS_SETTING_NOT_FOUND;
@@ -77,6 +78,7 @@ public class SmsService {
         sms.setResend(Boolean.FALSE);
         sms.setInternalReference(getInternalReference.apply(merchant.getMerchantCode()));
         sms.setResendCount(0);
+        sms.setCost(smsCost);
 
         auditService.stampAuditedEntity(sms);
         var savedSms = smsRepository.save(sms);
@@ -96,17 +98,69 @@ public class SmsService {
 
         auditService.stampAuditedEntity(sms);
 
+        //PUSH SMS KAFKA
+
+        //SMS TRANSACTION FOR PUSHED SMS
+
+
         return smsDtoService.smsToDto(sms);
     }
 
+    public void reverseTransactionForNonDeliveredSms(TSms sms){
+
+    }
+
     @Transactional
-    public void transactDeliveredSms(TSms sms){
+    public void transactForPushedSms(TSms sms){
         var merchant = sms.getMerchant();
+        var merchantSmsSetting = merchantSmsSettingRepository.findByMerchant(merchant).get();
         var smsCost = getMerchantSmsSetting(merchant).getSmsCost();
-        var merchantAccount = getAccountByMerchant(merchant);
+        var merchantDebitAccount = getAccountByMerchant(merchant, AccountTypeEnum.DEBIT);
+        var merchantAccountToBeUsed = (merchantSmsSetting.getPaymentType().equals(PaymentTypeEnum.POSTPAID) && (merchantDebitAccount.getCurrentBalance().compareTo(smsCost) < 0 )) ? getAccountByMerchant(merchant, AccountTypeEnum.CREDIT) : merchantDebitAccount;
         var smsSystemAccount = accountRepository.findByCode(smsSystemAccountCode).get();
 
-        transferFundsFromAccountToAccount(merchantAccount, smsSystemAccount, smsCost, sms);
+        if(merchantAccountToBeUsed.getAccountType().equals(PaymentTypeEnum.PREPAID)) {
+            transferFundsFromAccountToAccount(merchantAccountToBeUsed, smsSystemAccount, smsCost, sms);
+        }else{
+            transactionOnCreditAccount(merchantAccountToBeUsed, sms);
+        }
+
+    }
+
+    @Transactional
+    protected void transactionOnCreditAccount(TAccount creditAccount, TSms sms){
+
+        var externalReference = sms.getExternalReference();
+        var smsCost = sms.getCost();
+
+        sms.setPaymentStatus(PaymentStatusEnum.NOT_PAID);
+        auditService.stampLongEntity(sms);
+
+        smsRepository.save(sms);
+
+        Validate.isTrue(creditAccount.getAccountType().equals(AccountTypeEnum.CREDIT), ExceptionType.BAD_REQUEST, NOT_CREDIT_ACCOUNT);
+
+        var amountBefore = creditAccount.getCurrentBalance();
+        var amountAfter = amountBefore.add(smsCost);
+
+        creditAccount.setCurrentBalance(amountAfter);
+        auditService.stampAuditedEntity(creditAccount);
+
+        var updatedCreditAccount = accountRepository.save(creditAccount);
+
+        var creditAccountTransaction = TAccountTransaction.builder()
+                .account(updatedCreditAccount)
+                .transactionType(TransactionTypeEnum.ACCOUNT_CREDIT)
+                .nonReversal(Boolean.FALSE)
+                .transactionStatus(TransactionStatusEnum.SUCCESSFUL)
+                .balanceBefore(amountBefore)
+                .balanceAfter(amountAfter)
+                .statusDescription(SMS + TransactionTypeEnum.ACCOUNT_CREDIT.getDescription()+ " CREDIT AMOUNT")
+                .externalTransactionId(externalReference)
+                .build();
+
+        auditService.stampLongEntity(creditAccountTransaction);
+        accountTransactionRepository.save(creditAccountTransaction);
     }
 
     protected void transferFundsFromAccountToAccount(TAccount fromAccount, TAccount toAccount, BigDecimal amount, TSms sms) {
@@ -162,7 +216,7 @@ public class SmsService {
         var savedToAccountTransaction = accountTransactionRepository.save(toAccountTransaction);
 
         //cash flow
-        var cashFlowType = toAccount.getAccountType().equals(AccountTypeEnum.SYSTEM) ? CashFlowEnum.BUSINESS_TO_MAIN : CashFlowEnum.MAIN_TO_BUSINESS;
+        var cashFlowType = toAccount.getAccountCategory().equals(AccountCategoryEnum.SYSTEM) ? CashFlowEnum.BUSINESS_TO_MAIN : CashFlowEnum.MAIN_TO_BUSINESS;
 
         var cashFlow = TCashflow.builder()
                 .externalReference(externalReference)
@@ -176,6 +230,11 @@ public class SmsService {
 
         auditService.stampLongEntity(cashFlow);
         cashflowRepository.save(cashFlow);
+
+        //UPDATE SMS TO PAID
+        sms.setPaymentStatus(PaymentStatusEnum.PAID);
+        auditService.stampLongEntity(sms);
+        smsRepository.save(sms);
     }
 
     private TMerchantSmsSetting getMerchantSmsSetting(TMerchant merchant) {
@@ -186,11 +245,11 @@ public class SmsService {
 
     private TAccount getMerchantAccount(){
         var merchant = getLoggedInUserMerchant();
-        return getAccountByMerchant(merchant);
+        return getAccountByMerchant(merchant, AccountTypeEnum.DEBIT);
     }
 
-    private TAccount getAccountByMerchant(TMerchant merchant){
-        var existingAccount = accountRepository.findByMerchant(merchant);
+    private TAccount getAccountByMerchant(TMerchant merchant, AccountTypeEnum accountType){
+        var existingAccount = accountRepository.findByMerchantAndAccountType(merchant, accountType);
         Validate.isPresent(existingAccount, MERCHANT_NOT_FOUND, merchant.getId());
         return existingAccount.get();
     }

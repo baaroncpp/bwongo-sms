@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import static com.bwongo.core.base.utils.BaseMsgUtils.CREATED_ON;
 import static io.netty.handler.codec.http.HttpHeaders.Values.APPLICATION_JSON;
 
 /**
@@ -64,7 +65,7 @@ public class UserApi {
     @GetMapping(path="pageable", produces = APPLICATION_JSON)
     public PageResponseDto getAllUsers(@RequestParam(name = "page") int page,
                                        @RequestParam(name = "size") int size) {
-        var pageable = PageRequest.of(page, size, Sort.by("createdOn").descending());
+        var pageable = PageRequest.of(page, size, Sort.by(CREATED_ON).descending());
         return userService.getAll(pageable);
     }
 
@@ -99,7 +100,7 @@ public class UserApi {
     public PageResponseDto getUserApprovals(@RequestParam(name = "page") int page,
                                                           @RequestParam(name = "size") int size,
                                                           @RequestParam(name = "status") String status){
-        var pageable = PageRequest.of(page, size, Sort.by("createdOn").descending());
+        var pageable = PageRequest.of(page, size, Sort.by(CREATED_ON).descending());
         return userService.getUserApprovals(status, pageable);
     }
 }

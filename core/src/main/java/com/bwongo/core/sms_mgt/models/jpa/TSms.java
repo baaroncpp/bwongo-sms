@@ -1,5 +1,7 @@
 package com.bwongo.core.sms_mgt.models.jpa;
 
+import com.bwongo.core.base.model.enums.PaymentStatusEnum;
+import com.bwongo.core.base.model.enums.PaymentTypeEnum;
 import com.bwongo.core.base.model.enums.SmsStatusEnum;
 import com.bwongo.core.base.model.jpa.AuditEntity;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
@@ -8,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.math.BigDecimal;
 
 /**
  * @Author bkaaron
@@ -31,6 +35,8 @@ public class TSms extends AuditEntity {
     private TMerchant merchant;
     private String internalReference;
     private String externalReference;
+    private PaymentStatusEnum paymentStatus;
+    private BigDecimal cost;
 
     @Column(name = "phone_number")
     public String getPhoneNumber() {
@@ -77,5 +83,16 @@ public class TSms extends AuditEntity {
     @Column(name = "external_reference")
     public String getExternalReference() {
         return externalReference;
+    }
+
+    @Column(name = "payment_status")
+    @Enumerated(EnumType.STRING)
+    public PaymentStatusEnum getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    @Column(name = "cost")
+    public BigDecimal getCost() {
+        return cost;
     }
 }
