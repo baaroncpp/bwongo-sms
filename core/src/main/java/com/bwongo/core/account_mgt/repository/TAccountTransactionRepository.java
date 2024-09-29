@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @Author bkaaron
  * @Project bwongo-sms
@@ -16,4 +18,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TAccountTransactionRepository extends JpaRepository<TAccountTransaction, Long> {
     Page<TAccountTransaction> findAllByAccount(TAccount account, Pageable pageable);
+    List<TAccountTransaction> findAllByInternalTransactionId(String internalTransactionId);
 }

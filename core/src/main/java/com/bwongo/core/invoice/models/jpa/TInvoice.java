@@ -4,6 +4,9 @@ import com.bwongo.core.base.model.enums.InvoiceStatusEnum;
 import com.bwongo.core.base.model.jpa.BaseEntity;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -15,6 +18,9 @@ import java.util.Date;
  * @Date 9/20/24
  * @Time 7:51 PM
  **/
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Setter
 @Entity
 @Table(name = "t_invoice", schema = "core")
@@ -44,7 +50,7 @@ public class TInvoice extends BaseEntity {
     }
 
     @JoinColumn(name = "merchant_id", referencedColumnName = "id")
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     public TMerchant getMerchant() {
         return merchant;
     }

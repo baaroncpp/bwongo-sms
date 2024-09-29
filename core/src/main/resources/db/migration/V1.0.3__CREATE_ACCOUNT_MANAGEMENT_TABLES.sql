@@ -35,7 +35,8 @@ CREATE TABLE t_account_transaction
     status_description TEXT,
     balance_before NUMERIC(19, 4),
     balance_after NUMERIC(19, 4),
-    external_transaction_id TEXT
+    external_transaction_id TEXT,
+    internal_transaction_id TEXT
 );
 
 CREATE TABLE t_cash_flow
@@ -44,6 +45,7 @@ CREATE TABLE t_cash_flow
     created_on TIMESTAMP DEFAULT now(),
     modified_on TIMESTAMP,
     external_reference TEXT,
+    internal_reference TEXT UNIQUE,
     amount NUMERIC(19, 4),
     from_account_transaction_id BIGINT REFERENCES t_account_transaction(id),
     to_account_transaction_id BIGINT REFERENCES t_account_transaction(id),

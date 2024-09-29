@@ -31,6 +31,7 @@ public class TAccountTransaction extends BaseEntity {
     private String statusDescription;
     private BigDecimal balanceBefore;
     private BigDecimal balanceAfter;
+    private String internalTransactionId;
     private String externalTransactionId;
 
     @JoinColumn(name = "account_id", referencedColumnName = "id", updatable = false)
@@ -73,5 +74,10 @@ public class TAccountTransaction extends BaseEntity {
     @Column(name = "external_transaction_id")
     public String getExternalTransactionId() {
         return externalTransactionId;
+    }
+
+    @Column(name = "internal_transaction_id")
+    public String getInternalTransactionId() {
+        return internalTransactionId;
     }
 }

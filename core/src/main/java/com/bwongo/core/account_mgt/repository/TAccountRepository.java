@@ -7,6 +7,7 @@ import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -17,6 +18,8 @@ import java.util.Optional;
  **/
 @Repository
 public interface TAccountRepository extends JpaRepository<TAccount, Long> {
+
     Optional<TAccount> findByMerchantAndAccountType(TMerchant merchant, AccountTypeEnum accountType);
+    List<TAccount> findAllByAccountType(AccountTypeEnum accountType);
     Optional<TAccount> findByCode(String code);
 }

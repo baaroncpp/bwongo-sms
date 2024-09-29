@@ -12,6 +12,7 @@ import com.bwongo.core.account_mgt.repository.TAccountTransactionRepository;
 import com.bwongo.core.account_mgt.repository.TMomoDepositRepository;
 import com.bwongo.core.account_mgt.service.dto.AccountDtoService;
 import com.bwongo.core.base.model.dto.response.PageResponseDto;
+import com.bwongo.core.base.model.enums.AccountTypeEnum;
 import com.bwongo.core.base.model.enums.TransactionStatusEnum;
 import com.bwongo.core.base.service.AuditService;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
@@ -129,7 +130,7 @@ public class AccountService {
     }
 
     private TAccount getAccountByMerchant(TMerchant merchant){
-        var existingAccount = accountRepository.findByMerchant(merchant);
+        var existingAccount = accountRepository.findByMerchantAndAccountType(merchant, AccountTypeEnum.DEBIT);
         Validate.isPresent(existingAccount, MERCHANT_NOT_FOUND, merchant.getId());
         return existingAccount.get();
     }

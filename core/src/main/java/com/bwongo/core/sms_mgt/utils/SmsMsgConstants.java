@@ -17,4 +17,6 @@ public class SmsMsgConstants {
     public static final String SMS_NOT_FOUND = "sms : %s not found";
     public static final String SMS_ALREADY_DELIVERED = "sms already delivered";
     public static final String PENDING_DELIVERY = "pending delivery";
+    public static final String NO_SMS_TRANSACTION_FOUND = "no sms transactions found";
+    public static final String CANT_RESENT_TRANSACTION_FAILURE = "cannot resend transaction failure";
 }

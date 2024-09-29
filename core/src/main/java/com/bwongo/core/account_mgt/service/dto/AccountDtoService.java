@@ -7,7 +7,7 @@ import com.bwongo.core.account_mgt.models.dto.response.CashFlowResponseDto;
 import com.bwongo.core.account_mgt.models.dto.response.MomoDepositResponseDto;
 import com.bwongo.core.account_mgt.models.jpa.TAccount;
 import com.bwongo.core.account_mgt.models.jpa.TAccountTransaction;
-import com.bwongo.core.account_mgt.models.jpa.TCashflow;
+import com.bwongo.core.account_mgt.models.jpa.TCashFlow;
 import com.bwongo.core.account_mgt.models.jpa.TMomoDeposit;
 import com.bwongo.core.merchant_mgt.service.dto.MerchantDtoService;
 import com.bwongo.core.user_mgt.service.dto.UserDtoService;
@@ -110,7 +110,7 @@ public class AccountDtoService {
         );
     }
 
-    public CashFlowResponseDto cashFlowToDto(TCashflow cashflow){
+    public CashFlowResponseDto cashFlowToDto(TCashFlow cashflow){
 
         if(cashflow == null)
             return null;

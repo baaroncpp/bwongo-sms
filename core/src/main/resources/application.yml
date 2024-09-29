@@ -39,6 +39,8 @@ sms:
   default-title: BWONGO-SMS
   max-number-characters: 50
   sms-cost: 50
+  invoice-template:
+  monthly-row-template:
 
 api:
   encryption-password: 12345

@@ -1,7 +1,8 @@
 package com.bwongo.core.base.service;
 
-import com.bwongo.core.base.model.enums.NotificationStatusEnum;
-import com.bwongo.core.base.model.enums.NotificationTypeEnum;
+import com.bwongo.commons.models.dto.NotificationDto;
+import com.bwongo.commons.models.dto.NotificationStatusEnum;
+import com.bwongo.commons.models.dto.NotificationTypeEnum;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

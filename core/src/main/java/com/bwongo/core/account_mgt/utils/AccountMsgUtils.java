@@ -18,4 +18,5 @@ public class AccountMsgUtils {
     public static final String ACCOUNT_DELETED = "account is deleted";
     public static final String INSUFFICIENT_FUNDS = "insufficient funds";
     public static final String NOT_CREDIT_ACCOUNT = "not a credit account";
+    public static final String MERCHANT_ACCOUNT_NOT_FOUND = "%s account for merchant: %s not found";
 }

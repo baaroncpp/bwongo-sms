@@ -14,7 +14,7 @@ import java.math.BigDecimal;
  * @Author bkaaron
  * @Project bwongo-sms
  * @Date 8/19/24
- * @LocalTime 2:20 PM
+ * @LocalTime 2:20PM
  **/
 @Builder
 @AllArgsConstructor
@@ -22,8 +22,9 @@ import java.math.BigDecimal;
 @Setter
 @Entity
 @Table(name = "t_cash_flow",schema = "core")
-public class TCashflow extends BaseEntity {
+public class TCashFlow extends BaseEntity {
     private String externalReference;
+    private String internalReference;
     private BigDecimal amount;
     private TAccountTransaction fromAccountTransaction;
     private TAccountTransaction toAccountTransaction;
@@ -69,5 +70,10 @@ public class TCashflow extends BaseEntity {
     @Enumerated(EnumType.STRING)
     public CashFlowEnum getFlowType() {
         return flowType;
+    }
+
+    @Column(name = "internal_reference")
+    public String getInternalReference() {
+        return internalReference;
     }
 }

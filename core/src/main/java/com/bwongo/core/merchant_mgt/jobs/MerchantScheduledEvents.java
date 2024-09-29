@@ -4,6 +4,7 @@ import com.bwongo.core.merchant_mgt.service.MerchantApiService;
 import com.bwongo.core.merchant_mgt.service.MerchantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Configuration
 public class MerchantScheduledEvents {
 
     private final MerchantService merchantService;
