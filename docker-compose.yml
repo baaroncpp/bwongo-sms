@@ -44,13 +44,13 @@ services:
     depends_on:
       - kafka
 
-  notification:
-    build:
+#  notification:
+#    build:
 #      context: ./notification-service
 #      dockerfile: Dockerfile
-      dockerfile: Dockerfile.notify
-    container_name: notification-service
-    ports:
-      - "2028:2028"
-    depends_on:
-      - kafka
+#      dockerfile: Dockerfile.notify
+#    container_name: notification-service
+#    ports:
+#      - "2028:2028"
+#    depends_on:
+#      - kafka

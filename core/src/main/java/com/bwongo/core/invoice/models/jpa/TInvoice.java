@@ -16,7 +16,7 @@ import java.util.Date;
  * @Author bkaaron
  * @Project bwongo-sms
  * @Date 9/20/24
- * @Time 7:51 PM
+ * @Time 7:51PM
  **/
 @Builder
 @AllArgsConstructor

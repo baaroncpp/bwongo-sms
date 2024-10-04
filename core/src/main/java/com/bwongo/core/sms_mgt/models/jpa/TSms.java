@@ -1,7 +1,6 @@
 package com.bwongo.core.sms_mgt.models.jpa;
 
 import com.bwongo.core.base.model.enums.PaymentStatusEnum;
-import com.bwongo.core.base.model.enums.PaymentTypeEnum;
 import com.bwongo.core.base.model.enums.SmsStatusEnum;
 import com.bwongo.core.base.model.jpa.AuditEntity;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;

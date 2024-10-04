@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Setter
 @Entity
-@Table(name = "t_account_transaction",schema = "core")
+@Table(name = "t_account_transaction", schema = "core")
 public class TAccountTransaction extends BaseEntity {
     private TAccount account;
     private TransactionTypeEnum transactionType;
@@ -50,7 +50,7 @@ public class TAccountTransaction extends BaseEntity {
         return nonReversal;
     }
 
-    @Column(name = "status")
+    @Column(name = "transaction_status")
     @Enumerated(EnumType.STRING)
     public TransactionStatusEnum getTransactionStatus() {
         return transactionStatus;

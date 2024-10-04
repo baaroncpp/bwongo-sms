@@ -37,6 +37,11 @@ public class TCashFlow extends BaseEntity {
         return externalReference;
     }
 
+    @Column(name = "internal_reference")
+    public String getInternalReference() {
+        return internalReference;
+    }
+
     @Column(name = "amount")
     public BigDecimal getAmount() {
         return amount;
@@ -70,10 +75,5 @@ public class TCashFlow extends BaseEntity {
     @Enumerated(EnumType.STRING)
     public CashFlowEnum getFlowType() {
         return flowType;
-    }
-
-    @Column(name = "internal_reference")
-    public String getInternalReference() {
-        return internalReference;
     }
 }

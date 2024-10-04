@@ -31,7 +31,7 @@ CREATE TABLE t_account_transaction
     account_id BIGINT REFERENCES t_account(id),
     transaction_type VARCHAR(50) NOT NULL,
     non_reversal BOOLEAN DEFAULT FALSE,
-    status VARCHAR(50),
+    transaction_status VARCHAR(50),
     status_description TEXT,
     balance_before NUMERIC(19, 4),
     balance_after NUMERIC(19, 4),
