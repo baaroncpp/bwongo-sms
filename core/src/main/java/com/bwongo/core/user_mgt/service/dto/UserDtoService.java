@@ -147,16 +147,12 @@ public class UserDtoService {
             return null;
         }
 
-        var userGroup = new TUserGroup();
-        userGroup.setId(userRequestDto.userGroupId());
-
         return TUser.builder()
                 .email(userRequestDto.email())
                 .password(passwordEncoder.encode(userRequestDto.password()))
                 .secondName(userRequestDto.secondName())
                 .firstName(userRequestDto.firstName())
                 .userType(UserTypeEnum.valueOf(userRequestDto.userType()))
-                .userGroup(userGroup)
                 .build();
     }
 

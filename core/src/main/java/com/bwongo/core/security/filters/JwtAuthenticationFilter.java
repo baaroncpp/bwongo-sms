@@ -90,7 +90,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void isAccountBlocked(UserDetails userDetails){
 
         if(!userDetails.isAccountNonExpired() || !userDetails.isAccountNonLocked() || !userDetails.isCredentialsNonExpired()){
-            throw  new BadCredentialsException("user account is blocked");
+            throw new BadCredentialsException("user account is blocked");
         }
 
     }

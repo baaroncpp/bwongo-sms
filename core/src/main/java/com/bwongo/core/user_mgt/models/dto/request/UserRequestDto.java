@@ -4,6 +4,7 @@ import com.bwongo.commons.exceptions.model.ExceptionType;
 import com.bwongo.commons.text.StringRegExUtil;
 import com.bwongo.commons.utils.Validate;
 
+import static com.bwongo.core.base.utils.EnumValidation.isAdminUserType;
 import static com.bwongo.core.base.utils.EnumValidation.isUserType;
 import static com.bwongo.core.user_mgt.utils.UserMsgConstants.*;
 
@@ -18,7 +19,6 @@ public record UserRequestDto(
         String secondName,
         String email,
         String password,
-        Long userGroupId,
         String userType
 ) {
     public void validate(){
@@ -26,9 +26,8 @@ public record UserRequestDto(
         Validate.notEmpty(secondName, SECOND_NAME_REQUIRED);
         Validate.notEmpty(email, EMAIL_REQUIRED);
         Validate.notEmpty(password, PASSWORD_REQUIRED);
-        Validate.notNull(userGroupId, ExceptionType.BAD_REQUEST, USER_GROUP_ID_REQUIRED);
         Validate.notNull(userType, ExceptionType.BAD_REQUEST, USER_TYPE_REQUIRED);
-        Validate.isTrue(isUserType(userType), ExceptionType.BAD_REQUEST, VALID_USER_TYPE);
+        Validate.isTrue(isAdminUserType(userType), ExceptionType.BAD_REQUEST, VALID_USER_TYPE);
         StringRegExUtil.stringOfEmail(email, INVALID_EMAIL);
         StringRegExUtil.stringOfStandardPassword(password, STANDARD_PASSWORD);
     }

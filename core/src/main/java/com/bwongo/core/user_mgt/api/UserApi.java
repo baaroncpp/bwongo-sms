@@ -31,7 +31,7 @@ public class UserApi {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyAuthority('USER_ROLE.UPDATE','ADMIN_ROLE.UPDATE')")
-    @PostMapping(path = "/change-password", produces = APPLICATION_JSON)
+    @PostMapping(path = "/change-password", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
     public Boolean changePassword(@RequestBody ChangePasswordRequestDto changePasswordRequestDto){
         return userService.changePassword(changePasswordRequestDto);
     }
@@ -90,7 +90,7 @@ public class UserApi {
     }
 
     @PreAuthorize("hasAnyAuthority('USER_ROLE.UPDATE','ADMIN_ROLE.UPDATE')")
-    @PatchMapping(path = "suspend/{id}", produces = APPLICATION_JSON, consumes = APPLICATION_JSON)
+    @PatchMapping(path = "suspend/{id}", produces = APPLICATION_JSON)
     public boolean suspendUserAccount(@PathVariable("id") Long id){
         return userService.suspendUserAccount(id);
     }
@@ -98,8 +98,8 @@ public class UserApi {
     @GetMapping(path = "approvals", produces = APPLICATION_JSON)
     @PreAuthorize("hasAnyAuthority('USER_ROLE.READ','ADMIN_ROLE.READ')")
     public PageResponseDto getUserApprovals(@RequestParam(name = "page") int page,
-                                                          @RequestParam(name = "size") int size,
-                                                          @RequestParam(name = "status") String status){
+                                            @RequestParam(name = "size") int size,
+                                            @RequestParam(name = "status") String status){
         var pageable = PageRequest.of(page, size, Sort.by(CREATED_ON).descending());
         return userService.getUserApprovals(status, pageable);
     }

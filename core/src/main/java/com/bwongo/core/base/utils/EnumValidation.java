@@ -24,7 +24,14 @@ public class EnumValidation {
                 UserTypeEnum.MERCHANT.name()
         );
         return userTypeEnumList.contains(value);
+    }
 
+    public static boolean isAdminUserType(String value){
+        List<String> userTypeEnumList = List.of(
+                UserTypeEnum.ADMIN.name(),
+                UserTypeEnum.SUPER_ADMIN.name()
+        );
+        return userTypeEnumList.contains(value);
     }
 
     public static boolean isApprovalStatus(String value){

@@ -60,11 +60,8 @@ public class UserService {
         var existingUserUsername = userRepository.findByEmail(userRequestDto.email());
         Validate.isTrue(existingUserUsername.isEmpty(), ExceptionType.BAD_REQUEST ,USERNAME_TAKEN, userRequestDto.email());
 
-        var existingUserGroup = userGroupRepository.findById(userRequestDto.userGroupId());
-        Validate.isPresent(existingUserGroup, USER_GROUP_DOES_NOT_EXIST, userRequestDto.userGroupId());
+        var existingUserGroup = userGroupRepository.findTUserGroupByName("ADMIN_GROUP");
         final var userGroup = existingUserGroup.get();
-
-        Validate.isTrue(!userGroup.getName().equals(MERCHANT_GROUP), ExceptionType.BAD_REQUEST, INVALID_USER_GROUP);
 
         var user = userDtoService.dtoToTUser(userRequestDto);
         user.setAccountExpired(Boolean.FALSE);
@@ -105,8 +102,7 @@ public class UserService {
         if(!user.getEmail().equals(email))
             Validate.isTrue(existingUserEmail.isEmpty(), ExceptionType.BAD_REQUEST, EMAIL_ALREADY_TAKEN, email);
 
-        var existingUserGroup = userGroupRepository.findById(userUpdateRequestDto.userGroupId());
-        Validate.isPresent(existingUserGroup, USER_GROUP_DOES_NOT_EXIST, userUpdateRequestDto.userGroupId());
+        var existingUserGroup = userGroupRepository.findTUserGroupByName("ADMIN_GROUP");
         final var userGroup = existingUserGroup.get();
 
         Validate.isTrue(!userGroup.getName().equals(MERCHANT_GROUP), ExceptionType.BAD_REQUEST, INVALID_USER_GROUP);

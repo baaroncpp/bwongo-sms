@@ -50,6 +50,7 @@ import static com.bwongo.core.user_mgt.utils.UserMsgConstants.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class MerchantService {
 
     private final AuditService auditService;
@@ -71,7 +72,6 @@ public class MerchantService {
     @Value("${sms.sms-cost}")
     private BigDecimal smsCost;
 
-    @Transactional
     public MerchantResponseDto addMerchant(MerchantRequestDto merchantRequestDto){
 
         merchantRequestDto.validate();
@@ -131,7 +131,7 @@ public class MerchantService {
         var merchant = getMerchantById(merchantId);
 
         var existingCountry = countryRepository.findById(countryId);
-        Validate.isPresent(existingCountry, COUNTRY_WITH_ID_NOT_FOUND);
+        Validate.isPresent(existingCountry, COUNTRY_WITH_ID_NOT_FOUND, countryId);
         var country = existingCountry.get();
 
         if(!merchantPhoneNumber.equals(merchant.getPhoneNumber()))
@@ -150,9 +150,10 @@ public class MerchantService {
         updatedMerchant.setMerchantStatus(merchant.getMerchantStatus());
         updatedMerchant.setActivatedBy(merchant.getActivatedBy());
         updatedMerchant.setNonVerifiedPhoneNumber(Boolean.FALSE);
+        updatedMerchant.setLocation(merchantUpdateRequestDto.location());
 
-        auditService.stampAuditedEntity(merchant);
-        var savedMerchant = merchantRepository.save(merchant);
+        auditService.stampAuditedEntity(updatedMerchant);
+        var savedMerchant = merchantRepository.save(updatedMerchant);
 
         return merchantDtoService.merchantToDto(savedMerchant);
     }
@@ -202,7 +203,6 @@ public class MerchantService {
         //TODO SEND TO KAFKA THE ACTIVATION CODE
     }
 
-    @Transactional
     public MerchantResponseDto activateMerchantByCode(String code){
 
         var existingMerchantActivation = merchantActivationRepository.findByActivationCode(code);
@@ -225,6 +225,8 @@ public class MerchantService {
 
         auditService.stampAuditedEntity(merchant);
         var activatedMerchant = merchantRepository.save(merchant);
+
+        activateMerchantUser(activatedMerchant);
 
         return merchantDtoService.merchantToDto(activatedMerchant);
     }
@@ -252,10 +254,27 @@ public class MerchantService {
             merchantActivationRepository.save(activation);
         });
 
+        activateMerchantUser(activatedMerchant);
+
         return merchantDtoService.merchantToDto(activatedMerchant);
     }
 
-    @Transactional
+    public void activateMerchantUser(TMerchant merchant){
+
+        var existingMerchantUser = userRepository.findByMerchantId(merchant.getId());
+        Validate.isPresent(existingMerchantUser, MERCHANT_USER_NOT_FOUND);
+        var merchantUser = existingMerchantUser.get();
+
+        merchantUser.setApproved(Boolean.TRUE);
+        merchantUser.setAccountExpired(Boolean.FALSE);
+        merchantUser.setAccountLocked(Boolean.FALSE);
+        merchantUser.setCredentialExpired(Boolean.FALSE);
+        merchantUser.setDeleted(Boolean.FALSE);
+        merchantUser.setApprovedBy(auditService.getLoggedInUser().getId());
+        auditService.stampLongEntity(merchantUser);
+        userRepository.save(merchantUser );
+    }
+
     public MerchantSmsSettingResponseDto addMerchantSmsSetting(MerchantSmsSettingRequestDto merchantSmsSettingRequestDto){
 
         merchantSmsSettingRequestDto.validate();
@@ -310,7 +329,7 @@ public class MerchantService {
         return merchantDtoService.merchantSmsSettingToDto(merchantSmsSettingRepository.save(merchantSmsSetting));
     }
 
-    @Transactional
+
     protected void sendActivationCode(TMerchant merchant){
 
         Validate.isTrue(!merchant.isActive(), ExceptionType.BAD_REQUEST, MERCHANT_ALREADY_ACTIVATED, merchant.getId());

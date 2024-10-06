@@ -1,17 +1,15 @@
 package com.bwongo.core.user_mgt.models.dto.request;
 
-import com.bwongo.commons.exceptions.model.ExceptionType;
 import com.bwongo.commons.text.StringRegExUtil;
 import com.bwongo.commons.utils.Validate;
 
-import static com.bwongo.core.base.utils.EnumValidation.isUserType;
 import static com.bwongo.core.user_mgt.utils.UserMsgConstants.*;
 
 /**
  * @Author bkaaron
  * @Project bwongo-sms
  * @Date 8/20/24
- * @LocalTime 9:43 AM
+ * @LocalTime 9:43AM
  **/
 public record MerchantUserRequestDto(
         String firstName,

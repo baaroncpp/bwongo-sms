@@ -19,4 +19,5 @@ public interface TUserRepository extends JpaRepository<TUser, Long> {
     Long countByUserType(UserTypeEnum userTypeEnum);
     boolean existsByEmail(String email);
     void deleteByEmail(String email);
+    Optional<TUser> findByMerchantId(Long merchantId);
 }

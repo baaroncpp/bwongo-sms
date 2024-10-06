@@ -31,8 +31,8 @@ public class MerchantApi {
     private final MerchantService merchantService;
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAnyAuthority('MERCHANT_ROLE.WRITE','ADMIN_ROLE.WRITE')")
-    @PostMapping(consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
+    //@PreAuthorize("hasAnyAuthority('MERCHANT_ROLE.WRITE','ADMIN_ROLE.WRITE')")
+    @PostMapping(path = "create", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
     public MerchantResponseDto addMerchant(@RequestBody MerchantRequestDto merchantRequestDto){
         return merchantService.addMerchant(merchantRequestDto);
     }
@@ -50,7 +50,7 @@ public class MerchantApi {
     }
 
     @PreAuthorize("hasAnyAuthority('MERCHANT_ROLE.READ','ADMIN_ROLE.READ')")
-    @GetMapping(path = "all", produces = APPLICATION_JSON)
+    @GetMapping(path = "pageable", produces = APPLICATION_JSON)
     public PageResponseDto getAllMerchants(@RequestParam(name = "page") int page,
                                            @RequestParam(name = "size") int size){
         var pageable = PageRequest.of(page, size, Sort.by(CREATED_ON).descending());

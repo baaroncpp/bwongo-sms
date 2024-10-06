@@ -1,5 +1,6 @@
 package com.bwongo.core.security.service;
 
+import com.bwongo.commons.exceptions.BadCredentialsException;
 import com.bwongo.commons.exceptions.model.ExceptionType;
 import com.bwongo.commons.utils.Validate;
 import com.bwongo.core.security.model.SecurityUserDetails;
@@ -10,6 +11,7 @@ import com.bwongo.core.user_mgt.repository.TUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +37,8 @@ public class SecurityUserService {
                 () -> new UsernameNotFoundException(String.format("username: %s not found", username))
         );
 
+        isAccountBlocked(user);
+
         List<TGroupAuthority> groupAuthorities = groupAuthorityRepository.findByUserGroup(user.getUserGroup());
         Validate.notNull(groupAuthorities, ExceptionType.INSUFFICIENT_AUTH, "user %s has no permissions, to any services", user.getEmail());
 
@@ -55,5 +59,11 @@ public class SecurityUserService {
                 .authorities(permissions)
                 .password(user.getPassword())
                 .build();
+    }
+
+    private void isAccountBlocked(TUser user){
+        if(user.isAccountExpired() || user.isAccountLocked() || user.isCredentialExpired()){
+            throw new BadCredentialsException("user account is blocked");
+        }
     }
 }
