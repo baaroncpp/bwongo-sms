@@ -70,8 +70,6 @@ public class SmsService {
     private final TCashFlowRepository cashFlowRepository;
     private final KafkaMessagePublisher kafkaMessagePublisher;
 
-    private static final String SMS = "sms";
-
     @Value("${app.system-account-code.sms}")
     private String smsSystemAccountCode;
 

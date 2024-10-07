@@ -1,15 +1,21 @@
 package com.bwongo.core.merchant_mgt.service;
 
 import com.bwongo.commons.exceptions.model.ExceptionType;
+import com.bwongo.commons.models.dto.NotificationDto;
+import com.bwongo.commons.models.dto.NotificationStatusEnum;
+import com.bwongo.commons.models.dto.NotificationTypeEnum;
 import com.bwongo.commons.utils.Validate;
 import com.bwongo.core.account_mgt.models.jpa.TAccount;
+import com.bwongo.core.account_mgt.models.jpa.TAccountTransaction;
 import com.bwongo.core.account_mgt.repository.TAccountRepository;
+import com.bwongo.core.account_mgt.repository.TAccountTransactionRepository;
 import com.bwongo.core.base.model.dto.response.PageResponseDto;
 import com.bwongo.core.base.model.enums.*;
 import com.bwongo.core.base.repository.TAddressRepository;
 import com.bwongo.core.base.repository.TCountryRepository;
 import com.bwongo.core.base.service.AuditService;
 import com.bwongo.core.base.service.BaseService;
+import com.bwongo.core.base.service.KafkaMessagePublisher;
 import com.bwongo.core.merchant_mgt.models.dto.request.*;
 import com.bwongo.core.merchant_mgt.models.dto.response.MerchantResponseDto;
 import com.bwongo.core.merchant_mgt.models.dto.response.MerchantSmsSettingResponseDto;
@@ -20,10 +26,14 @@ import com.bwongo.core.merchant_mgt.repository.TMerchantActivationRepository;
 import com.bwongo.core.merchant_mgt.repository.TMerchantRepository;
 import com.bwongo.core.merchant_mgt.repository.TMerchantSmsSettingRepository;
 import com.bwongo.core.merchant_mgt.service.dto.MerchantDtoService;
+import com.bwongo.core.sms_mgt.models.jpa.TSms;
+import com.bwongo.core.sms_mgt.repository.TSmsRepository;
 import com.bwongo.core.user_mgt.models.jpa.TUser;
 import com.bwongo.core.user_mgt.models.jpa.TUserGroup;
 import com.bwongo.core.user_mgt.repository.TUserGroupRepository;
 import com.bwongo.core.user_mgt.repository.TUserRepository;
+import lombok.Data;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +42,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 import static com.bwongo.commons.text.StringUtil.getRandom6DigitString;
 import static com.bwongo.commons.text.StringUtil.getRandom8DigitString;
@@ -39,6 +51,8 @@ import static com.bwongo.commons.utils.DateTimeUtil.getCurrentUTCTime;
 import static com.bwongo.core.base.utils.BaseMsgUtils.*;
 import static com.bwongo.core.base.utils.BaseUtils.pageToDto;
 import static com.bwongo.core.merchant_mgt.utils.MerchantMsgConstants.*;
+import static com.bwongo.core.sms_mgt.utils.SmsMsgConstants.SMS;
+import static com.bwongo.core.sms_mgt.utils.SmsUtils.getInternalReference;
 import static com.bwongo.core.user_mgt.utils.UserMsgConstants.*;
 
 /**
@@ -53,24 +67,33 @@ import static com.bwongo.core.user_mgt.utils.UserMsgConstants.*;
 @Transactional
 public class MerchantService {
 
+    private final TSmsRepository smsRepository;
     private final AuditService auditService;
     private final MerchantDtoService merchantDtoService;
-    private final BaseService baseService;
     private final TMerchantRepository merchantRepository;
     private final TMerchantSmsSettingRepository merchantSmsSettingRepository;
     private final TUserRepository userRepository;
     private final TCountryRepository countryRepository;
-    private final TAddressRepository addressRepository;
     private final TMerchantActivationRepository merchantActivationRepository;
     private final TUserGroupRepository userGroupRepository;
-    private final TMerchantSmsSettingRepository merchantSmsSettingsRepository;
     private final TAccountRepository accountRepository;
+    private final KafkaMessagePublisher kafkaMessagePublisher;
+    private final TAccountTransactionRepository accountTransactionRepository;
 
     @Value("${sms.max-number-characters}")
     private int smsMaxNumberOfCharacters;
 
     @Value("${sms.sms-cost}")
     private BigDecimal smsCost;
+
+    @Value("${system.sms-cost}")
+    private BigDecimal systemSmsCost;
+
+    @Value("${sms.default-title}")
+    private String defaultTitle;
+
+    @Value("${system.merchant-code}")
+    private String systemMerchantCode;
 
     public MerchantResponseDto addMerchant(MerchantRequestDto merchantRequestDto){
 
@@ -173,7 +196,7 @@ public class MerchantService {
         var merchant = getMerchantById(merchantId);
 
         var merchantActivations = merchantActivationRepository.findAllByMerchantAndActivationCodeStatus(merchant, ActivationCodeStatusEnum.FAILED);
-        Validate.isTrue(merchantActivations.size() >= 3, ExceptionType.BAD_REQUEST, CONTACT_ADMIN_MAX_FAILS);
+        Validate.isTrue(merchantActivations.size() <= 3, ExceptionType.BAD_REQUEST, CONTACT_ADMIN_MAX_FAILS);
 
         var existingMerchantActivation = merchantActivationRepository.findByMerchantAndActive(merchant, Boolean.TRUE);
 
@@ -198,18 +221,26 @@ public class MerchantService {
                 .build();
 
         auditService.stampLongEntity(merchantActivation);
-        merchantActivationRepository.save(merchantActivation);
+        var savedMerchantActivation = merchantActivationRepository.save(merchantActivation);
 
-        //TODO SEND TO KAFKA THE ACTIVATION CODE
+        sendActivationCodeSms(savedMerchantActivation);
     }
 
-    public MerchantResponseDto activateMerchantByCode(String code){
+    public MerchantResponseDto activateMerchantByCode(ActivationCodeRequestDto activationCodeRequestDto){
 
-        var existingMerchantActivation = merchantActivationRepository.findByActivationCode(code);
+        activationCodeRequestDto.validate();
+
+        var code = activationCodeRequestDto.activationCode();
+        var merchantId = activationCodeRequestDto.merchantId();
+        var merchant = getMerchantById(merchantId);
+
+        var existingMerchantActivation = merchantActivationRepository.findByActivationCodeAndMerchant(code, merchant);
         Validate.isPresent(existingMerchantActivation, MERCHANT_ACTIVATION_NOT_FOUND, code);
         var merchantActivation = existingMerchantActivation.get();
-        var merchant = merchantActivation.getMerchant();
 
+        var codeNotExpired = merchantActivation.getActivationCodeStatus().equals(ActivationCodeStatusEnum.EXPIRED) ? Boolean.FALSE : Boolean.TRUE;
+
+        Validate.isTrue(codeNotExpired, ExceptionType.BAD_REQUEST, CODE_EXPIRED);
         Validate.isTrue(merchantActivation.isActive(), ExceptionType.BAD_REQUEST, INVALID_ACTIVATION_CODE, merchantActivation.getActivationCodeStatus());
 
         merchantActivation.setActive(Boolean.FALSE);
@@ -288,7 +319,7 @@ public class MerchantService {
         merchantSmsSetting.setMaxNumberOfCharactersPerSms(smsMaxNumberOfCharacters);
         merchantSmsSetting.setMerchant(merchant);
         merchantSmsSetting.setSmsCost(smsCost);
-        auditService.stampLongEntity(merchantSmsSetting);
+        auditService.stampAuditedEntity(merchantSmsSetting);
 
         var savedMerchantSmsSetting = merchantSmsSettingRepository.save(merchantSmsSetting);
 
@@ -307,13 +338,19 @@ public class MerchantService {
         Validate.isPresent(existingMerchantSmsSetting, MERCHANT_SMS_SETTING_NOT_FOUND, smsSettingId);
         var smsSetting = existingMerchantSmsSetting.get();
 
-        //smsSetting.setSmsCost(merchantSmsSettingUpdateRequestDto.smsCost());
-        smsSetting.setCustomized(merchantSmsSettingUpdateRequestDto.isCustomized());
-        smsSetting.setCustomizedTitle(merchantSmsSettingUpdateRequestDto.customizedTitle());
-        smsSetting.setSmsCost(smsCost);
-        auditService.stampLongEntity(smsSetting);
+        var customizedTitle = merchantSmsSettingUpdateRequestDto.isCustomized() ? merchantSmsSettingUpdateRequestDto.customizedTitle() : defaultTitle;
 
-        return merchantDtoService.merchantSmsSettingToDto(merchantSmsSettingRepository.save(smsSetting));
+        smsSetting.setCustomized(merchantSmsSettingUpdateRequestDto.isCustomized());
+        smsSetting.setCustomizedTitle(customizedTitle);
+        smsSetting.setSmsCost(smsCost);
+        smsSetting.setPaymentType(PaymentTypeEnum.valueOf(merchantSmsSettingUpdateRequestDto.paymentType()));
+        auditService.stampAuditedEntity(smsSetting);
+
+        var updatedSmsSetting = merchantSmsSettingRepository.save(smsSetting);
+
+        createMerchantAccounts(updatedSmsSetting);
+
+        return merchantDtoService.merchantSmsSettingToDto(updatedSmsSetting);
     }
 
     public MerchantSmsSettingResponseDto setCustomSmsCost(CustomSmsCostRequestDto customSmsCostRequestDto){
@@ -349,34 +386,108 @@ public class MerchantService {
                 .build();
 
         auditService.stampLongEntity(merchantActivation);
-        merchantActivationRepository.save(merchantActivation);
+        var savedMerchantActivation = merchantActivationRepository.save(merchantActivation);
 
         //TODO SEND TO KAFKA THE ACTIVATION CODE
+        sendActivationCodeSms(savedMerchantActivation);
     }
+
+
 
     public void invalidateExpiredActivationCodes(){
         var merchantActivations = merchantActivationRepository.findAllByCreatedOnBeforeAndActive(getCurrentUTCTime(), Boolean.TRUE);
 
         merchantActivations.forEach(activation -> {
-            activation.setActive(Boolean.FALSE);
-            activation.setActivationCodeStatus(ActivationCodeStatusEnum.EXPIRED);
 
-            auditService.stampLongEntity(activation);
-            merchantActivationRepository.save(activation);
+            var startDateTime = activation.getCreatedOn().getTime();
+            var endDateTime = startDateTime + (60 * 60 * 1000);
+
+            if(getCurrentUTCTime().getTime() > endDateTime){
+                activation.setActive(Boolean.FALSE);
+                activation.setActivationCodeStatus(ActivationCodeStatusEnum.EXPIRED);
+
+                auditService.stampLongEntity(activation);
+                merchantActivationRepository.save(activation);
+            }
         });
+    }
+
+    private void sendActivationCodeSms(TMerchantActivation merchantActivation){
+
+        var systemMerchant = merchantRepository.findByMerchantCode(systemMerchantCode).get(); //get systems merchant
+        var phoneNumber = merchantActivation.getMerchant().getPhoneNumber();
+        var message = merchantActivation.getActivationCode();
+        var internalReference = getInternalReference.apply(systemMerchant.getMerchantCode());
+
+        var sms = TSms.builder()
+                .phoneNumber(phoneNumber)
+                .message(message)
+                .sender(defaultTitle)
+                .smsStatus(SmsStatusEnum.PENDING)
+                .isResend(Boolean.FALSE)
+                .resendCount(0)
+                .internalReference(internalReference)
+                .paymentStatus(PaymentStatusEnum.NOT_PAID)
+                .merchant(systemMerchant)
+                .cost(systemSmsCost)
+                .build();
+
+        auditService.stampAuditedEntity(sms);
+        smsRepository.save(sms);
+
+        var notificationDto = NotificationDto.builder()
+                .sender(defaultTitle)
+                .recipient(phoneNumber)
+                .message(message)
+                .status(NotificationStatusEnum.PENDING)
+                .merchantCode(systemMerchantCode)
+                .notificationType(NotificationTypeEnum.SMS)
+                .internalReference(internalReference)
+                .build();
+
+        kafkaMessagePublisher.sendNotificationToTopic(notificationDto);
+
+        var systemCreditAccount = accountRepository.findByMerchantAndAccountType(systemMerchant, AccountTypeEnum.CREDIT).get();
+
+        var amountBefore = systemCreditAccount.getCurrentBalance();
+        var amountAfter = amountBefore.add(smsCost);
+
+        systemCreditAccount.setCurrentBalance(amountAfter);
+        auditService.stampAuditedEntity(systemCreditAccount);
+
+        var updatedCreditAccount = accountRepository.save(systemCreditAccount);
+
+        var creditAccountTransaction = TAccountTransaction.builder()
+                .account(updatedCreditAccount)
+                .transactionType(TransactionTypeEnum.ACCOUNT_CREDIT)
+                .nonReversal(Boolean.FALSE)
+                .transactionStatus(TransactionStatusEnum.SUCCESSFUL)
+                .balanceBefore(amountBefore)
+                .balanceAfter(amountAfter)
+                .statusDescription(SMS + TransactionTypeEnum.ACCOUNT_CREDIT.getDescription()+ " CREDIT AMOUNT")
+                .internalTransactionId(internalReference)
+                .build();
+
+        auditService.stampLongEntity(creditAccountTransaction);
+        accountTransactionRepository.save(creditAccountTransaction);
     }
 
     private void createMerchantAccounts(TMerchantSmsSetting merchantSmsSetting){
         var merchant = merchantSmsSetting.getMerchant();
-        var accountType = merchantSmsSetting.getPaymentType();
+        var paymentType = merchantSmsSetting.getPaymentType();
 
         createMerchantAccount(merchant, AccountTypeEnum.DEBIT);
 
-        if (accountType.name().equals(AccountTypeEnum.CREDIT.name()))
+        if (paymentType.name().equals(PaymentTypeEnum.POSTPAID.name()))
             createMerchantAccount(merchant, AccountTypeEnum.CREDIT);
     }
 
     private void createMerchantAccount(TMerchant merchant, AccountTypeEnum accountType){
+
+        var existingAccount = accountRepository.findByMerchantAndAccountType(merchant, accountType);
+
+        if(existingAccount.isPresent())
+            return;
 
         var account = TAccount.builder()
                 .name(merchant.getMerchantName())

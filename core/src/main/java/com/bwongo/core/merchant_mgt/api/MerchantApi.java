@@ -49,7 +49,7 @@ public class MerchantApi {
         return merchantService.getMerchant(id);
     }
 
-    @PreAuthorize("hasAnyAuthority('MERCHANT_ROLE.READ','ADMIN_ROLE.READ')")
+    @PreAuthorize("hasAnyAuthority('ADMIN_ROLE.READ')")
     @GetMapping(path = "pageable", produces = APPLICATION_JSON)
     public PageResponseDto getAllMerchants(@RequestParam(name = "page") int page,
                                            @RequestParam(name = "size") int size){
@@ -66,14 +66,14 @@ public class MerchantApi {
 
     @ResponseStatus(HttpStatus.ACCEPTED)
     @PreAuthorize("hasAnyAuthority('MERCHANT_ROLE.WRITE','ADMIN_ROLE.WRITE')")
-    @GetMapping(path = "activation-code/{code}")
-    public MerchantResponseDto activateMerchantByCode(@PathVariable("code") String code){
-        return merchantService.activateMerchantByCode(code);
+    @PostMapping(path = "activate", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
+    public MerchantResponseDto activateMerchantByCode(@RequestBody ActivationCodeRequestDto activationCodeRequestDto){
+        return merchantService.activateMerchantByCode(activationCodeRequestDto);
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)
     @PreAuthorize("hasAnyAuthority('ADMIN_ROLE.WRITE')")
-    @GetMapping(path = "{id}/activate")
+    @GetMapping(path = "{id}/activate", produces = APPLICATION_JSON)
     public MerchantResponseDto activateMerchantByAdmin(@PathVariable("id") Long id){
         return merchantService.activateMerchantByAdmin(id);
     }
@@ -91,7 +91,7 @@ public class MerchantApi {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN_ROLE.UPDATE')")
-    @PutMapping(path = "customize/sms-cost", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
+    @PatchMapping(path = "customize/sms-cost", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
     public MerchantSmsSettingResponseDto addCustomSms(@RequestBody CustomSmsCostRequestDto customSmsCostRequestDto){
         return merchantService.setCustomSmsCost(customSmsCostRequestDto);
     }

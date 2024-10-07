@@ -18,6 +18,7 @@ import java.util.Optional;
  **/
 @Repository
 public interface TMerchantActivationRepository extends JpaRepository<TMerchantActivation, Long> {
+    Optional<TMerchantActivation> findByActivationCodeAndMerchant(String activationCode, TMerchant merchant);
     Optional<TMerchantActivation> findByActivationCode(String activationCode);
     List<TMerchantActivation> findAllByMerchantAndActivationCodeStatus(TMerchant merchant, ActivationCodeStatusEnum activationCodeStatus);
     Optional<TMerchantActivation> findByMerchantAndActive(TMerchant merchant, boolean active);

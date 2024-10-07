@@ -127,7 +127,7 @@ public class ExceptionsHandler {
             response = new ResponseEntity<>(exceptionPayLoad, httpStatus);
         }
 
-        if(ex instanceof AccessDeniedException){
+        if(ex instanceof org.springframework.security.access.AccessDeniedException){
             httpStatus = HttpStatus.valueOf(403);
             var exceptionPayLoad = new ExceptionPayLoad(
                     request.getRequestURI(),

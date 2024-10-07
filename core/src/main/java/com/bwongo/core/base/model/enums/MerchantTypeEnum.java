@@ -7,5 +7,5 @@ package com.bwongo.core.base.model.enums;
  * @LocalTime 3:52 PM
  **/
 public enum MerchantTypeEnum {
-    ORGANIZATION, COMPANY, BUSINESS, PERSONAL, OTHER
+    ORGANIZATION, COMPANY, BUSINESS, PERSONAL, OTHER, SYSTEM
 }

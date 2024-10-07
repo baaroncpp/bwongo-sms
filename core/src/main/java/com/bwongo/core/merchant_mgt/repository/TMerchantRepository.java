@@ -4,6 +4,8 @@ import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * @Author bkaaron
  * @Project bwongo-sms
@@ -13,6 +15,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TMerchantRepository extends JpaRepository<TMerchant, Long> {
     boolean existsByEmail(String merchantMail);
-
     boolean existsByPhoneNumber(String merchantPhoneNumber);
+    Optional<TMerchant> findByMerchantCode(String merchantCode);
 }

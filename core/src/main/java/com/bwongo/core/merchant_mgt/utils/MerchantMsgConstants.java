@@ -36,4 +36,6 @@ public class MerchantMsgConstants {
     public static final String NULL_PAYMENT_TYPE = "paymentType is required";
     public static final String INVALID_PAYMENT_TYPE = "invalid paymentType, options POSTPAID, PREPAID";
     public static final String MERCHANT_USER_NOT_FOUND = "merchant user not found";
+    public static final String ACTIVATION_CODE_REQUIRED = "activationCode is required";
+    public static final String CODE_EXPIRED = "activation code is expired";
 }

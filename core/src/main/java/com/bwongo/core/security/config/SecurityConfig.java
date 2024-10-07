@@ -33,7 +33,8 @@ public class SecurityConfig {
             "/v3/api-docs.yaml",
             "/swagger-ui/**",
             "/swagger-ui.html",
-            "/api/v1/merchant/create"
+            "/api/v1/merchant/create",
+            "/api/v1/merchant/activate"
     };
 
     @Bean

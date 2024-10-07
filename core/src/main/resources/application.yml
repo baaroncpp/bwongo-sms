@@ -44,3 +44,7 @@ sms:
 
 api:
   encryption-password: 12345
+
+system:
+  sms-cost: 30
+  merchant-code: 100001

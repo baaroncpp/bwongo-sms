@@ -82,7 +82,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         }catch (InsufficientAuthenticationException | ExpiredJwtException | MalformedJwtException |
-                AccessDeniedException | BadCredentialsException e) {
+                AccessDeniedException | BadCredentialsException | org.springframework.security.access.AccessDeniedException | org.springframework.security.authentication.BadCredentialsException e) {
             resolver.resolveException(request, response, null, e);
         }
     }
