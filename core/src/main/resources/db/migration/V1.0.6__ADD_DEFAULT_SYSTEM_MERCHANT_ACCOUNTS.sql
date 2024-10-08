@@ -6,7 +6,7 @@ VALUES
 WITH
     adminUser AS (SELECT id FROM t_user WHERE email = 'admin@bwongo.com'),
     merchant AS (SELECT id FROM t_merchant WHERE merchant_code = '100001')
-INSERT INTO t_account(created_by_id, name, code, status, merchant_id, account_type, account_category, activated_by)
+INSERT INTO t_account(created_by_id, name, code, status, merchant_id, account_type, account_category, activated_by, current_balance)
 VALUES
-    ((select id from adminUser), 'SYSTEM_CREDIT', '10011001', 'ACTIVE', (select id from merchant), 'CREDIT', 'SYSTEM', (select id from adminUser)),
-    ((select id from adminUser), 'SYSTEM_DEBIT', '10010001', 'ACTIVE', (select id from merchant), 'DEBIT', 'SYSTEM', (select id from adminUser));
+    ((select id from adminUser), 'SYSTEM_CREDIT', '10011001', 'ACTIVE', (select id from merchant), 'CREDIT', 'SYSTEM', (select id from adminUser), 0),
+    ((select id from adminUser), 'SYSTEM_DEBIT', '10010001', 'ACTIVE', (select id from merchant), 'DEBIT', 'SYSTEM', (select id from adminUser), 0);

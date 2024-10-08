@@ -222,8 +222,6 @@ public class MerchantService {
 
         auditService.stampLongEntity(merchantActivation);
         var savedMerchantActivation = merchantActivationRepository.save(merchantActivation);
-
-        sendActivationCodeSms(savedMerchantActivation);
     }
 
     public MerchantResponseDto activateMerchantByCode(ActivationCodeRequestDto activationCodeRequestDto){
@@ -450,7 +448,7 @@ public class MerchantService {
         var systemCreditAccount = accountRepository.findByMerchantAndAccountType(systemMerchant, AccountTypeEnum.CREDIT).get();
 
         var amountBefore = systemCreditAccount.getCurrentBalance();
-        var amountAfter = amountBefore.add(smsCost);
+        var amountAfter = amountBefore.add(systemSmsCost);
 
         systemCreditAccount.setCurrentBalance(amountAfter);
         auditService.stampAuditedEntity(systemCreditAccount);
@@ -492,10 +490,11 @@ public class MerchantService {
         var account = TAccount.builder()
                 .name(merchant.getMerchantName())
                 .code(generateAccountCode())
-                .status(AccountStatusEnum.PENDING)
+                .status(AccountStatusEnum.ACTIVE)
                 .merchant(merchant)
                 .currentBalance(BigDecimal.ZERO)
                 .accountType(accountType)
+                .activatedBy(getLoggedInUser())
                 .accountCategory(AccountCategoryEnum.MERCHANT)
                 .balanceToNotifyAt(BigDecimal.valueOf(1000))
                 .build();

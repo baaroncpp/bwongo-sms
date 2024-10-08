@@ -7,5 +7,5 @@ package com.bwongo.core.base.model.enums;
  * @LocalTime 8:47 PM
  **/
 public enum SmsStatusEnum {
-    PENDING, DELIVERED, FAILED
+    SENT, PENDING, DELIVERED, FAILED
 }

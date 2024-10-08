@@ -59,7 +59,7 @@ public class SmsApi {
     }
 
     @PreAuthorize("hasAnyAuthority('MERCHANT_ROLE.READ')")
-    @GetMapping(path = "all", produces = APPLICATION_JSON)
+    @GetMapping(path = "pageable", produces = APPLICATION_JSON)
     public PageResponseDto getAllSms(@RequestParam(name = "page") int page,
                                      @RequestParam(name = "size") int size){
         var pageable = PageRequest.of(page, size, Sort.by(CREATED_ON).descending());

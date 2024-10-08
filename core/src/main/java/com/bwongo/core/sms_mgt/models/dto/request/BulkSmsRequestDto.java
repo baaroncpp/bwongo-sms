@@ -19,7 +19,7 @@ public record BulkSmsRequestDto(
         List<SmsDto> smsDtoList
 ) {
     public void validate(){
-        Validate.notEmpty(sender, NULL_SENDER);
+        //Validate.notEmpty(sender, NULL_SENDER);
         Validate.isTrue(!smsDtoList.isEmpty(), ExceptionType.BAD_REQUEST, EMPTY_SMS_REQUEST_LIST);
         smsDtoList.forEach(SmsDto::validate);
     }

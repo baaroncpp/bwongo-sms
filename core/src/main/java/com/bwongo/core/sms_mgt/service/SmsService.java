@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.bwongo.core.account_mgt.utils.AccountMsgUtils.NOT_CREDIT_ACCOUNT;
 import static com.bwongo.core.account_mgt.utils.AccountUtils.checkIfAccountIsValid;
@@ -70,8 +71,11 @@ public class SmsService {
     private final TCashFlowRepository cashFlowRepository;
     private final KafkaMessagePublisher kafkaMessagePublisher;
 
-    @Value("${app.system-account-code.sms}")
-    private String smsSystemAccountCode;
+    @Value("${system.account.debit}")
+    private String systemDebitAccount;
+
+    @Value("${system.account.credit}")
+    private String systemCreditAccount;
 
     public SmsResponseDto sendSms(SmsRequestDto smsRequestDto) {
 
@@ -86,7 +90,7 @@ public class SmsService {
 
         var sms = smsDtoService.dtoToSms(smsRequestDto);
         sms.setMerchant(merchant);
-        sms.setSmsStatus(SmsStatusEnum.PENDING);
+        sms.setSmsStatus(SmsStatusEnum.SENT);
         sms.setResend(Boolean.FALSE);
         sms.setInternalReference(getInternalReference.apply(merchant.getMerchantCode()));
         sms.setResendCount(0);
@@ -186,9 +190,9 @@ public class SmsService {
         var smsCost = getMerchantSmsSetting(merchant).getSmsCost();
         var merchantDebitAccount = getAccountByMerchant(merchant, AccountTypeEnum.DEBIT);
         var merchantAccountToBeUsed = (merchantSmsSetting.getPaymentType().equals(PaymentTypeEnum.POSTPAID) && (merchantDebitAccount.getCurrentBalance().compareTo(smsCost) < 0 )) ? getAccountByMerchant(merchant, AccountTypeEnum.CREDIT) : merchantDebitAccount;
-        var smsSystemAccount = accountRepository.findByCode(smsSystemAccountCode).get();
+        var smsSystemAccount = accountRepository.findByCode(systemDebitAccount).get();
 
-        if(merchantAccountToBeUsed.getAccountType().equals(PaymentTypeEnum.PREPAID)) {
+        if(Objects.equals(merchantAccountToBeUsed.getAccountType().name(), AccountTypeEnum.DEBIT.name())) {
             transferFundsFromAccountToAccount(merchantAccountToBeUsed, smsSystemAccount, smsCost, sms);
         }else{
             transactionOnCreditAccount(merchantAccountToBeUsed, sms);
