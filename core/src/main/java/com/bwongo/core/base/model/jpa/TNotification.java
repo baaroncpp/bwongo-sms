@@ -29,13 +29,14 @@ public class TNotification extends BaseEntity {
     private NotificationTypeEnum notificationType;
     private String internalReference;
     private String externalReference;
+    private String eventId;
 
     @Column(name = "sender")
     public String getSender() {
         return sender;
     }
 
-    @Column(name = "receipient")
+    @Column(name = "recipient")
     public String getRecipient() {
         return recipient;
     }
@@ -70,5 +71,10 @@ public class TNotification extends BaseEntity {
     @Column(name = "external_reference")
     public String getExternalReference() {
         return externalReference;
+    }
+
+    @Column(name = "event_id")
+    public String getEventId() {
+        return eventId;
     }
 }

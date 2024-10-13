@@ -1,6 +1,7 @@
 package com.bwongo.core.base.service;
 
 import com.bwongo.commons.models.dto.NotificationDto;
+import com.bwongo.commons.models.event.NotificationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,8 +10,6 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
-
-import static com.bwongo.core.base.utils.BaseMsgUtils.SMS_TOPIC;
 
 /**
  * @Author bkaaron
@@ -28,20 +27,22 @@ public class KafkaMessagePublisher {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void sendNotificationToTopic(NotificationDto notificationDto) {
+    public void sendNotificationToTopic(NotificationDto notification) {
+        var notificationEvent = new NotificationEvent(notification);
+
         try {
-            CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(smsTopic, notificationDto);
+            CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(smsTopic, notificationEvent);
 
             future.whenComplete((result, exception) -> {
                 if (exception == null) {
                     log.info("Notification: [ {} ] sent successfully, with offset {}",
-                            notificationDto.toString(),
+                            notificationEvent.toString(),
                             result.getRecordMetadata().offset());
                 }else{
-                    log.error("Error sending notification :[ {} ] to topic due to : ", notificationDto.toString() ,exception);
+                    log.error("Error sending notification :[ {} ] to topic due to : ", notificationEvent.toString() ,exception);
                 }
             });
-            kafkaTemplate.send(SMS_TOPIC, notificationDto);
+            kafkaTemplate.send(smsTopic, notificationEvent);
         }catch (Exception e) {
             log.error(e.getMessage());
         }
