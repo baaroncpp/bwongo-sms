@@ -11,11 +11,12 @@ import com.bwongo.core.account_mgt.repository.TAccountRepository;
 import com.bwongo.core.account_mgt.repository.TAccountTransactionRepository;
 import com.bwongo.core.base.model.dto.response.PageResponseDto;
 import com.bwongo.core.base.model.enums.*;
-import com.bwongo.core.base.repository.TAddressRepository;
+import com.bwongo.core.base.model.jpa.TNotification;
+import com.bwongo.core.base.model.jpa.TOutBoxEvent;
 import com.bwongo.core.base.repository.TCountryRepository;
+import com.bwongo.core.base.repository.TNotificationRepository;
+import com.bwongo.core.base.repository.TOutBoxEventRepository;
 import com.bwongo.core.base.service.AuditService;
-import com.bwongo.core.base.service.BaseService;
-import com.bwongo.core.base.service.KafkaMessagePublisher;
 import com.bwongo.core.merchant_mgt.models.dto.request.*;
 import com.bwongo.core.merchant_mgt.models.dto.response.MerchantResponseDto;
 import com.bwongo.core.merchant_mgt.models.dto.response.MerchantSmsSettingResponseDto;
@@ -32,8 +33,6 @@ import com.bwongo.core.user_mgt.models.jpa.TUser;
 import com.bwongo.core.user_mgt.models.jpa.TUserGroup;
 import com.bwongo.core.user_mgt.repository.TUserGroupRepository;
 import com.bwongo.core.user_mgt.repository.TUserRepository;
-import lombok.Data;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,16 +41,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 import static com.bwongo.commons.text.StringUtil.getRandom6DigitString;
 import static com.bwongo.commons.text.StringUtil.getRandom8DigitString;
 import static com.bwongo.commons.utils.DateTimeUtil.getCurrentUTCTime;
 import static com.bwongo.core.base.utils.BaseMsgUtils.*;
+import static com.bwongo.core.base.utils.BaseUtils.convertNotificationToJson;
 import static com.bwongo.core.base.utils.BaseUtils.pageToDto;
 import static com.bwongo.core.merchant_mgt.utils.MerchantMsgConstants.*;
-import static com.bwongo.core.sms_mgt.utils.SmsMsgConstants.SMS;
+import static com.bwongo.core.sms_mgt.utils.SmsMsgConstants.*;
 import static com.bwongo.core.sms_mgt.utils.SmsUtils.getInternalReference;
 import static com.bwongo.core.user_mgt.utils.UserMsgConstants.*;
 
@@ -77,8 +75,9 @@ public class MerchantService {
     private final TMerchantActivationRepository merchantActivationRepository;
     private final TUserGroupRepository userGroupRepository;
     private final TAccountRepository accountRepository;
-    private final KafkaMessagePublisher kafkaMessagePublisher;
     private final TAccountTransactionRepository accountTransactionRepository;
+    private final TOutBoxEventRepository outBoxEventRepository;
+    private final TNotificationRepository notificationRepository;
 
     @Value("${sms.max-number-characters}")
     private int smsMaxNumberOfCharacters;
@@ -431,19 +430,9 @@ public class MerchantService {
                 .build();
 
         auditService.stampAuditedEntity(sms);
-        smsRepository.save(sms);
+        var savedSms = smsRepository.save(sms);
 
-        var notificationDto = NotificationDto.builder()
-                .sender(defaultTitle)
-                .recipient(phoneNumber)
-                .message(message)
-                .status(NotificationStatusEnum.PENDING)
-                .merchantCode(systemMerchantCode)
-                .notificationType(NotificationTypeEnum.SMS)
-                .internalReference(internalReference)
-                .build();
-
-        kafkaMessagePublisher.sendNotificationToTopic(notificationDto);
+        saveOutBoxEvent(savedSms);
 
         var systemCreditAccount = accountRepository.findByMerchantAndAccountType(systemMerchant, AccountTypeEnum.CREDIT).get();
 
@@ -468,6 +457,34 @@ public class MerchantService {
 
         auditService.stampLongEntity(creditAccountTransaction);
         accountTransactionRepository.save(creditAccountTransaction);
+    }
+
+    //OUTBOX FOR OUTBOX TRANSACTION PATTERN
+    private void saveOutBoxEvent(TSms sms){
+
+        var notification = TNotification.builder()
+                .sender(sms.getSender())
+                .recipient(sms.getPhoneNumber())
+                .message(sms.getMessage())
+                .status(NotificationStatusEnum.PENDING)
+                .merchantCode(sms.getMerchant().getMerchantCode())
+                .notificationType(NotificationTypeEnum.SMS)
+                .internalReference(sms.getInternalReference())
+                .build();
+
+        auditService.stampLongEntity(notification);
+        var savedNotification = notificationRepository.save(notification);
+
+        var outBoxEvent = TOutBoxEvent.builder()
+                .aggregatorType(NOTIFICATION_AGGREGATOR_TYPE)
+                .aggregatorId(savedNotification.getId())
+                .type(SMS_TYPE)
+                .payload(convertNotificationToJson(savedNotification))
+                .status(EventStatus.PENDING)
+                .build();
+
+        auditService.stampLongEntity(outBoxEvent);
+        outBoxEventRepository.save(outBoxEvent);
     }
 
     private void createMerchantAccounts(TMerchantSmsSetting merchantSmsSetting){

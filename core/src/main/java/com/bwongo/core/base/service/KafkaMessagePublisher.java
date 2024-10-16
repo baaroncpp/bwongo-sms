@@ -27,24 +27,19 @@ public class KafkaMessagePublisher {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void sendNotificationToTopic(NotificationDto notification) {
-        var notificationEvent = new NotificationEvent(notification);
+    public void sendNotificationToTopic(NotificationEvent notificationEvent) {
 
-        try {
-            CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(smsTopic, notificationEvent);
+        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(smsTopic, notificationEvent);
 
-            future.whenComplete((result, exception) -> {
-                if (exception == null) {
-                    log.info("Notification: [ {} ] sent successfully, with offset {}",
-                            notificationEvent.toString(),
-                            result.getRecordMetadata().offset());
-                }else{
-                    log.error("Error sending notification :[ {} ] to topic due to : ", notificationEvent.toString() ,exception);
-                }
-            });
-            kafkaTemplate.send(smsTopic, notificationEvent);
-        }catch (Exception e) {
-            log.error(e.getMessage());
-        }
+        future.whenComplete((result, exception) -> {
+            if (exception == null) {
+                log.info("Notification: [ {} ] sent successfully, with offset {}",
+                        notificationEvent.toString(),
+                        result.getRecordMetadata().offset());
+            }else{
+                log.error("Error sending notification :[ {} ] to topic due to : ", notificationEvent.toString() ,exception);
+            }
+        });
+        kafkaTemplate.send(smsTopic, notificationEvent);
     }
 }

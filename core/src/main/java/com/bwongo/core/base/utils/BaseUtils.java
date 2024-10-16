@@ -3,6 +3,8 @@ package com.bwongo.core.base.utils;
 import com.bwongo.commons.utils.DateTimeUtil;
 import com.bwongo.commons.utils.Validate;
 import com.bwongo.core.base.model.dto.response.PageResponseDto;
+import com.bwongo.core.base.model.jpa.TNotification;
+import com.google.gson.Gson;
 import org.springframework.data.domain.Page;
 
 import java.util.Date;
@@ -39,5 +41,9 @@ public class BaseUtils {
                 .totalPages(totalPages)
                 .data(data)
                 .build();
+    }
+
+    public static String convertNotificationToJson(TNotification notification){
+        return new Gson().toJson(notification);
     }
 }

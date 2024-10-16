@@ -2,6 +2,7 @@ package com.bwongo.core.base.api;
 
 
 import com.bwongo.commons.models.dto.NotificationDto;
+import com.bwongo.commons.models.event.NotificationEvent;
 import com.bwongo.core.base.model.dto.request.CountryRequestDto;
 import com.bwongo.core.base.model.dto.response.CountryResponseDto;
 import com.bwongo.core.base.service.BaseService;
@@ -40,7 +41,9 @@ public class BaseApi {
                 .recipient("tester2")
                 .build();
 
-        kafkaMessagePublisher.sendNotificationToTopic(notificationDto);
+        var notificationEvent = new NotificationEvent(notificationDto);
+
+        kafkaMessagePublisher.sendNotificationToTopic(notificationEvent);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN_ROLE.READ')")

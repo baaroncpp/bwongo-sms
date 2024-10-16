@@ -1,7 +1,6 @@
 package com.bwongo.core.sms_mgt.service;
 
 import com.bwongo.commons.exceptions.model.ExceptionType;
-import com.bwongo.commons.models.dto.NotificationDto;
 import com.bwongo.commons.models.dto.NotificationStatusEnum;
 import com.bwongo.commons.models.dto.NotificationTypeEnum;
 import com.bwongo.commons.utils.Validate;
@@ -13,8 +12,11 @@ import com.bwongo.core.account_mgt.repository.TAccountTransactionRepository;
 import com.bwongo.core.account_mgt.repository.TCashFlowRepository;
 import com.bwongo.core.base.model.dto.response.PageResponseDto;
 import com.bwongo.core.base.model.enums.*;
+import com.bwongo.core.base.model.jpa.TNotification;
+import com.bwongo.core.base.model.jpa.TOutBoxEvent;
+import com.bwongo.core.base.repository.TNotificationRepository;
+import com.bwongo.core.base.repository.TOutBoxEventRepository;
 import com.bwongo.core.base.service.AuditService;
-import com.bwongo.core.base.service.KafkaMessagePublisher;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchant;
 import com.bwongo.core.merchant_mgt.models.jpa.TMerchantSmsSetting;
 import com.bwongo.core.merchant_mgt.repository.TMerchantRepository;
@@ -42,6 +44,7 @@ import java.util.Objects;
 
 import static com.bwongo.core.account_mgt.utils.AccountMsgUtils.NOT_CREDIT_ACCOUNT;
 import static com.bwongo.core.account_mgt.utils.AccountUtils.checkIfAccountIsValid;
+import static com.bwongo.core.base.utils.BaseUtils.convertNotificationToJson;
 import static com.bwongo.core.base.utils.BaseUtils.pageToDto;
 import static com.bwongo.core.merchant_mgt.utils.MerchantMsgConstants.*;
 import static com.bwongo.core.sms_mgt.utils.SmsMsgConstants.*;
@@ -69,7 +72,8 @@ public class SmsService {
     private final TMerchantSmsSettingRepository merchantSmsSettingRepository;
     private final TAccountTransactionRepository accountTransactionRepository;
     private final TCashFlowRepository cashFlowRepository;
-    private final KafkaMessagePublisher kafkaMessagePublisher;
+    private final TNotificationRepository notificationRepository;
+    private final TOutBoxEventRepository outBoxEventRepository;
 
     @Value("${system.account.debit}")
     private String systemDebitAccount;
@@ -99,8 +103,8 @@ public class SmsService {
         auditService.stampAuditedEntity(sms);
         var savedSms = smsRepository.save(sms);
 
-        //PUBLISH SMS KAFKA
-        this.publishToKafka(savedSms);
+        //SAVE OUTBOX EVENT
+        this.saveOutBoxEvent(sms);
 
         //RECORD SMS TRANSACTION FOR PUBLISHED SMS
         this.transactForPushedSms(savedSms);
@@ -150,8 +154,8 @@ public class SmsService {
 
         auditService.stampAuditedEntity(sms);
 
-        //PUSH SMS KAFKA
-        this.publishToKafka(sms);
+        //SAVE OUTBOX EVENT
+        this.saveOutBoxEvent(sms);
 
         return smsDtoService.smsToDto(sms);
     }
@@ -352,9 +356,10 @@ public class SmsService {
         return existingSms.get();
     }
 
-    private void publishToKafka(TSms sms){
+    //OUTBOX FOR OUTBOX TRANSACTION PATTERN
+    private void saveOutBoxEvent(TSms sms){
 
-        var notification = NotificationDto.builder()
+        var notification = TNotification.builder()
                 .sender(sms.getSender())
                 .recipient(sms.getPhoneNumber())
                 .message(sms.getMessage())
@@ -364,7 +369,19 @@ public class SmsService {
                 .internalReference(sms.getInternalReference())
                 .build();
 
-        kafkaMessagePublisher.sendNotificationToTopic(notification);
+        auditService.stampLongEntity(notification);
+        var savedNotification = notificationRepository.save(notification);
+
+        var outBoxEvent = TOutBoxEvent.builder()
+                .aggregatorType(NOTIFICATION_AGGREGATOR_TYPE)
+                .aggregatorId(savedNotification.getId())
+                .type(SMS_TYPE)
+                .payload(convertNotificationToJson(savedNotification))
+                .status(EventStatus.PENDING)
+                .build();
+
+        auditService.stampLongEntity(outBoxEvent);
+        outBoxEventRepository.save(outBoxEvent);
     }
 
     private SmsRequestDto smsDtoToSmsRequestDto(SmsDto smsDto, String sender){

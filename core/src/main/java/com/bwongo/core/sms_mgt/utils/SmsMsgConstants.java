@@ -20,4 +20,7 @@ public class SmsMsgConstants {
     public static final String NO_SMS_TRANSACTION_FOUND = "no sms transactions found";
     public static final String CANT_RESENT_TRANSACTION_FAILURE = "cannot resend transaction failure";
     public static final String SMS = "sms";
+    public static final String NOTIFICATION_AGGREGATOR_TYPE = "notification";
+    public static final String SMS_TYPE = "send sms";
+    public static final String MAIL_TYPE = "send mail";
 }

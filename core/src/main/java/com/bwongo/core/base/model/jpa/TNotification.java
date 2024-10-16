@@ -1,7 +1,7 @@
 package com.bwongo.core.base.model.jpa;
 
-import com.bwongo.core.base.model.enums.NotificationStatusEnum;
-import com.bwongo.core.base.model.enums.NotificationTypeEnum;
+import com.bwongo.commons.models.dto.NotificationTypeEnum;
+import com.bwongo.commons.models.dto.NotificationStatusEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
