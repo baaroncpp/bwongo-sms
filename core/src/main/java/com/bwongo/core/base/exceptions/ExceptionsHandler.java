@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -20,6 +21,7 @@ import java.time.ZonedDateTime;
  **/
 @ControllerAdvice
 public class ExceptionsHandler {
+
     @ExceptionHandler(value = {BadRequestException.class})
     public ResponseEntity<Object> handleBadRequestException(BadRequestException badRequestException, HttpServletRequest request){
 
@@ -88,6 +90,20 @@ public class ExceptionsHandler {
         var exceptionPayLoad = new ExceptionPayLoad(
                 request.getRequestURI(),
                 defaultException.getMessage(),
+                httpStatus,
+                ZonedDateTime.now(ZoneId.of("Z"))
+        );
+
+        return new ResponseEntity<>(exceptionPayLoad, httpStatus);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleAllExceptions(Exception exception, WebRequest webRequest){
+        var httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        var exceptionPayLoad = new ExceptionPayLoad(
+                webRequest.getContextPath(),
+                exception.getMessage(),
                 httpStatus,
                 ZonedDateTime.now(ZoneId.of("Z"))
         );

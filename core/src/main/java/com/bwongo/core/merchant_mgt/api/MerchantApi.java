@@ -31,7 +31,7 @@ public class MerchantApi {
     private final MerchantService merchantService;
 
     @ResponseStatus(HttpStatus.CREATED)
-    //@PreAuthorize("hasAnyAuthority('MERCHANT_ROLE.WRITE','ADMIN_ROLE.WRITE')")
+    @PreAuthorize("hasAnyAuthority('MERCHANT_ROLE.WRITE','ADMIN_ROLE.WRITE')")
     @PostMapping(path = "create", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
     public MerchantResponseDto addMerchant(@RequestBody MerchantRequestDto merchantRequestDto){
         return merchantService.addMerchant(merchantRequestDto);
