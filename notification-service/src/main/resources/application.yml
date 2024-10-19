@@ -3,11 +3,12 @@ server:
 app:
   topic:
     sms: smsTopic
+    sms-update: smsUpdateTopic
 spring:
   application:
     name: notification-service
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:bwongo_sms_db}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:notify_db}
     username: ${DB_USERNAME:aaron}
     password: ${DB_PASSWORD:aaron}
   jpa:
@@ -19,6 +20,12 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+  flyway:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:notify_db}
+    user: ${DB_USERNAME:aaron}
+    password: ${DB_PASSWORD:aaron}
+    schemas: core
+    locations: classpath:db/migration
   kafka:
     consumer:
       bootstrap-servers: ${KAFKA_HOST:localhost}:${KAFKA_PORT:9092}
@@ -28,6 +35,11 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
        spring.json.trusted.packages: "*"
+
+    producer:
+      bootstrap-servers: ${KAFKA_HOST:localhost}:${KAFKA_PORT:9092}
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 #  ert:
 #      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
 #      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer

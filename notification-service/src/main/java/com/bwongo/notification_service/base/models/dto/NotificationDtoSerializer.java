@@ -1,5 +1,6 @@
 package com.bwongo.notification_service.base.models.dto;
 
+import com.bwongo.commons.models.dto.NotificationDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.serialization.Serializer;
 

@@ -7,4 +7,8 @@ package com.bwongo.notification_service.base.utils;
  * @Time 4:18 AM
  **/
 public class BaseMsgConstants {
+
+    private BaseMsgConstants() { }
+
+    public static final String SMS_UPDATE_TOPIC = "smsUpdateTopic";
 }

@@ -2,6 +2,7 @@ package com.bwongo.notification_service.base.service;
 
 import com.bwongo.commons.exceptions.BadRequestException;
 import com.bwongo.commons.exceptions.model.ExceptionType;
+import com.bwongo.commons.models.event.NotificationEvent;
 import com.bwongo.commons.utils.Validate;
 import com.bwongo.commons.models.dto.NotificationDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,25 +27,26 @@ public class KafkaMessageSubscriber {
 
     @RetryableTopic(attempts = "4", backoff = @Backoff(delay = 3000, multiplier = 1.5, maxDelay = 15000), exclude = {NullPointerException.class, BadRequestException.class})
     @KafkaListener(topics = "${app.topic.sms}", groupId = "sms-group")
-    public void consumeNotification(NotificationDto notification,
+    public void consumeNotification(NotificationEvent notificationEvent,
                                     @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
                                     @Header(KafkaHeaders.OFFSET) Long offset) {
         try{
-            log.info("Received notification: [ {} ] from {} offset {}", new ObjectMapper().writeValueAsString(notification), topic, offset);
+            log.info("Received notification: [ {} ] from {} offset {}", new ObjectMapper().writeValueAsString(notificationEvent), topic, offset);
 
-            var condition = (notification.getMerchantCode().isEmpty() || notification.getInternalReference().isEmpty()) ?  Boolean.FALSE : Boolean.TRUE;
+            var condition = notificationEvent.getEventId().toString().isEmpty() ?  Boolean.FALSE : Boolean.TRUE;
             Validate.isTrue(condition, ExceptionType.BAD_REQUEST, "Invalid notification");
 
+            //TODO after receiving
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
     }
 
     @DltHandler
-    public void listenDlt(NotificationDto notification,
+    public void listenDlt(NotificationEvent notificationEvent,
                           @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
                           @Header(KafkaHeaders.OFFSET) Long offset){
-        log.info("Dlt received notification: [ {} ] from {} offset {}", notification.toString(), topic, offset);
+        log.info("Dlt received notification: [ {} ] from {} offset {}", notificationEvent.toString(), topic, offset);
 
     }
 }
