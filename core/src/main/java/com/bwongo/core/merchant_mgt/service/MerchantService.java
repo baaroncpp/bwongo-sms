@@ -33,6 +33,8 @@ import com.bwongo.core.user_mgt.models.jpa.TUser;
 import com.bwongo.core.user_mgt.models.jpa.TUserGroup;
 import com.bwongo.core.user_mgt.repository.TUserGroupRepository;
 import com.bwongo.core.user_mgt.repository.TUserRepository;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -94,6 +96,7 @@ public class MerchantService {
     @Value("${system.merchant-code}")
     private String systemMerchantCode;
 
+    @CachePut(value = "merchants", key = "#result.id")
     public MerchantResponseDto addMerchant(MerchantRequestDto merchantRequestDto){
 
         merchantRequestDto.validate();
@@ -141,6 +144,7 @@ public class MerchantService {
         return merchantDtoService.merchantToDto(savedMerchant);
     }
 
+    @CachePut(value = "merchants", key = "#result.id")
     public MerchantResponseDto updateMerchant(MerchantUpdateRequestDto merchantUpdateRequestDto){
 
         merchantUpdateRequestDto.validate();
@@ -180,6 +184,7 @@ public class MerchantService {
         return merchantDtoService.merchantToDto(savedMerchant);
     }
 
+    @Cacheable(value = "merchants", key = "#id")
     public MerchantResponseDto getMerchant(Long merchantId){
         return merchantDtoService.merchantToDto(getMerchantById(merchantId));
     }
