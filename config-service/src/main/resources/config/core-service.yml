@@ -1,0 +1,10 @@
+server:
+  port: 2024
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:2025/eureka/
+management:
+  tracing:
+    sampling:
+      probability: 1.0
