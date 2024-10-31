@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthenticationService {
+
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final TUserRepository userRepository;
@@ -88,5 +89,9 @@ public class AuthenticationService {
 
     private SecurityUserDetails getMappedSecurityUserDetails(String username){
         return securityUserService.getSecurityUserDetails(username);
+    }
+
+    public Boolean validateMerchantSecretKey(String merchantCode, String secretKey) {
+        return securityUserService.validateMerchantSecretKey(merchantCode, secretKey);
     }
 }

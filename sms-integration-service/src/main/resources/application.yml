@@ -1,5 +1,5 @@
-server:
-  port: 2028
 spring:
   application:
     name: sms-integration-service
+  config:
+    import: "optional:configserver:http://localhost:2026"

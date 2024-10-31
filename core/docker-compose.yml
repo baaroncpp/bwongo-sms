@@ -15,6 +15,13 @@ services:
     ports:
       - "6379:6379"
 
+  zipkin:
+    image: openzipkin/zipkin:latest
+    ports:
+      - "9411:9411"  # Exposes Zipkin on port 9411
+    environment:
+      - STORAGE_TYPE=mem
+
   kafka:
     image: confluentinc/cp-kafka:latest
     container_name: kafka

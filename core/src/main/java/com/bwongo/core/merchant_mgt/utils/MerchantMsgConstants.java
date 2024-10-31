@@ -38,4 +38,6 @@ public class MerchantMsgConstants {
     public static final String MERCHANT_USER_NOT_FOUND = "merchant user not found";
     public static final String ACTIVATION_CODE_REQUIRED = "activationCode is required";
     public static final String CODE_EXPIRED = "activation code is expired";
+    public static final String MERCHANT_WITH_CODE_NOT_FOUND = "Merchant with code: %s not found";
+    public static final String API_SETTING_NOT_FOUND = "api settings not found";
 }
