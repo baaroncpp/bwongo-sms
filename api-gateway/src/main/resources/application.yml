@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: "optional:configserver:http://localhost:2026"
+  cloud:
+    gateway:
+      routes:
+        - id: core-service
+          uri: lb://core-service
+          predicates:
+            - Path=/core/**
+        - id: sms-integration-service
+          uri: lb://sms-integration-service
+          predicates:
+            - Path=/integration/**
